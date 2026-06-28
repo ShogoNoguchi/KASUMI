@@ -8,6 +8,10 @@
   <img alt="config" src="https://img.shields.io/badge/config-YAML-informational">
 </p>
 
+<p align="center">
+  <img src="docs/assets/kasumi-hero.png" alt="KASUMI: An Autonomous AI Scientist for Bureaucratic Personnel Policy" width="760">
+</p>
+
 # KASUMI: An Autonomous AI Scientist for Bureaucratic Personnel Policy
 
 **KASUMI** is a synthetic policy-science workflow for studying bureaucratic
@@ -22,10 +26,6 @@ into an anonymous paper.
 > is not a policy recommendation, a real-world causal estimate, a personnel
 > system, or a digital twin of any actual ministry or organization.
 
-<!-- HERO IMAGE PLACEHOLDER
-Insert a generated hero image here.
-Prompt: "A clean scientific dashboard for bureaucratic personnel policy discovery: translucent layers labelled Staffing Ideas, Transfer Design, Agent-Based Bureaucracy Simulation, Multiseed Holdout, Verified Claims, and Automated Review; calm blue-white palette; subtle Kasumigaseki-style civic architecture silhouettes; no company logos; title text 'KASUMI' centered; modern research-lab aesthetic; high resolution 16:9."
--->
 
 ## What KASUMI demonstrates
 
