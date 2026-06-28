@@ -1,0 +1,58 @@
+{
+  "schema_version": "public-summary-v1",
+  "reviews": [
+    {
+      "reviewer_role": "computational_science",
+      "summary": "This is an exemplary proof-of-concept synthetic research harness. The numerical claims are perfectly traceable to the provided evidence artifacts, and the automated verification confirms their correctness. The matched experimental design and the frozen holdout contract are strictly respected and clearly articulated in the final manuscript. The descriptions of the Shachi-based model and the policy environment are accurately derived from the provided model cards, avoiding implementation jargon. The paper's limitations are explicit, repeated, and appropriately frame the work as a synthetic experiment, not an empirical estimate. The separation between development/selection evidence and post-selection holdout evidence is clear and methodologically sound.",
+      "strengths": [
+        "Perfect numerical traceability: All 153 claims are verified with zero absolute error, and the manuscript's tables correctly reflect the audited evidence.",
+        "Methodological rigor: The use of a matched design with common random numbers for development and a clean separation for the frozen holdout ensures high internal validity within the synthetic environment.",
+        "Excellent claim boundaries: The manuscript repeatedly and explicitly states that the findings are limited to the synthetic model and are not real-world causal estimates or policy recommendations.",
+        "Clarity of communication: The model, environment, and policy mechanisms are described using the provided scientific documentation, making the work accessible and transparent.",
+        "Correct unit of analysis: The manuscript correctly identifies the simulation arm as the unit of analysis, avoiding the common pitfall of treating agent-months as independent observations.",
+        "Integrated verification: The entire process, from simulation to final paper, is supported by a manifest of cryptographic hashes and automated checks, demonstrating a high degree of implementation correctness and reproducibility."
+      ],
+      "weaknesses": [
+        "No weaknesses were identified with respect to the specified review criteria for a proof-of-concept harness."
+      ],
+      "required_revisions": [],
+      "scores": {
+        "causal_validity_score": 5,
+        "evidence_traceability_score": 5,
+        "service_continuity_score": 5,
+        "fairness_rights_score": 5,
+        "claim_boundary_score": 5,
+        "confidence": 5
+      },
+      "recommendation": "accept_poc"
+    },
+    {
+      "reviewer_role": "public_administration",
+      "summary": "This paper presents a synthetic experiment using an agent-based model to compare four policy pathways for addressing a public-service crisis. The model, built on the Shachi framework, uses LLM agents as employees within a Python-coded bureaucracy. The study finds that a 'capital deepening' strategy, investing in employee learning and digital tools, is the most effective at improving staff welfare while respecting preregistered service and fairness guardrails. The paper is positioned as a proof-of-concept for a synthetic research harness, explicitly disclaiming any real-world causal estimates or policy recommendations.",
+      "strengths": [
+        "All numerical claims are perfectly traceable to the provided run artifacts, and the matched-control design and frozen holdout contract are strictly respected.",
+        "The paper demonstrates exceptional discipline in defining its claim boundaries, consistently emphasizing the synthetic nature of the experiment and avoiding any extrapolation to real-world administrative contexts.",
+        "The descriptions of the Shachi framework, the LLM agents, and the Python-owned policy environment are clear, derived directly from the provided evidence cards, and avoid internal jargon.",
+        "Key public administration concerns—such as procedural fairness, service continuity, staff welfare, and involuntary transfers—are thoughtfully operationalized as mechanisms, endpoints, and guardrails within the simulation.",
+        "The use of the Japanese 'Wakate' proposal as a source for problem context and mechanism vocabulary is appropriate and correctly bounded, without being used for model calibration or as empirical evidence.",
+        "The analysis of why certain pathways failed (e.g., direct staffing breaching service guardrails, procedural justice breaching fairness guardrails) provides nuanced insights into policy trade-offs within the synthetic environment."
+      ],
+      "weaknesses": [
+        "The primary weakness is inherent to the synthetic proof-of-concept design: the lack of empirical grounding for agent behavior and organizational parameters. However, the paper is exemplary in its transparency about this limitation.",
+        "The concept of lawful authority, while implicitly represented by the immutable Python environment, could be more explicitly framed as the model's representation of the fixed administrative and legal rules that constrain agent action."
+      ],
+      "required_revisions": [
+        "No mandatory revisions are required, as the paper successfully fulfills its stated goal as a proof-of-concept. A minor suggestion is to add a sentence in the 'Dynamic Bureaucracy Model' section to explicitly state that the Python environment represents the fixed, lawful administrative framework within which agents operate."
+      ],
+      "scores": {
+        "causal_validity_score": 2,
+        "evidence_traceability_score": 5,
+        "service_continuity_score": 5,
+        "fairness_rights_score": 5,
+        "claim_boundary_score": 5,
+        "confidence": 5
+      },
+      "recommendation": "accept_poc"
+    }
+  ]
+}

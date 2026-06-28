@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "citation_rounds": 8,
+  "section_order": [
+    "Introduction",
+    "Related Work and Problem Context",
+    "Dynamic Bureaucracy Model",
+    "Matched Experimental Design",
+    "Results",
+    "Mechanism Diagnostics and Trade-offs",
+    "Limitations and External Validation",
+    "Conclusion"
+  ],
+  "section_tips": {
+    "Abstract": "State the synthetic policy question, the bounded AI-assisted mechanism-search contribution, the selection outcome, the robustness result or negative result, and the claim boundary. Use one paragraph. Do not type numerical outcome values in prose; the verified tables carry them.",
+    "Introduction": "Motivate the organizational mechanism problem, explain why static policy comparison is insufficient, state the contribution, and list the contributions. Keep real-world motivation separate from synthetic evidence.",
+    "Related Work and Problem Context": "Compare agent-based modeling, LLM-agent simulation, Shachi, The AI Scientist, and public-administration workplace evidence. Use the local source card for wakate2022 as Japanese problem context; do not imply that motivation sources calibrate coefficients or causal effects.",
+    "Dynamic Bureaucracy Model": "Explain employee LLM choices, Python-owned transitions, task cohorts, deadlines, quality and rework, service harm, strain, knowledge, exits, hiring, transfers, identity-safe events, sealed self-report, and the deterministic finite management allocator.",
+    "Matched Experimental Design": "Describe the fixed baseline, four exact interventions, matched keyed shocks, warm-up reuse, treatment unit, preregistered endpoint and guardrails, immutable selection, and the previously unused robustness cells. State which stages actually ran.",
+    "Results": "Use only the generated verified tables and figures. Describe direction, trade-offs, and whether a strictly beneficial candidate was selected. Do not invent confidence intervals and do not treat employee rows or person-months as independent replications. Do not type decimal or percentage outcome values in prose.",
+    "Mechanism Diagnostics and Trade-offs": "Distinguish sustained capacity, deadline deferral, external capacity, composition change, exits, hiring, transfer spillovers, and learning. Discuss donor-recipient and subgroup diagnostics without overstating causality.",
+    "Limitations and External Validation": "State that profiles, coefficients, task mix, hazards, and effect sizes are synthetic; LLM self-reports are model outputs; development is adaptive; current public release disables paid holdout; and real policy claims require administrative data, surveys, qualitative evidence, legal review, and prospective evaluation.",
+    "Conclusion": "Separate what was learned inside the model from the empirical measurements and institutional tests that should come next."
+  },
+  "required_placeholders_absent": [
+    "TITLE HERE",
+    "ABSTRACT HERE",
+    "INTRO HERE",
+    "RELATED WORK HERE",
+    "METHOD HERE",
+    "EXPERIMENTAL SETUP HERE",
+    "RESULTS HERE",
+    "MECHANISM ANALYSIS HERE",
+    "LIMITATIONS HERE",
+    "CONCLUSION HERE",
+    "REPLACE THIS CAPTION"
+  ],
+  "prose_numeric_policy": "Unverified outcome decimals and percentages are forbidden in free-form prose. Years, model/version/run/seed identifiers, figure/table references, and preregistered design constants are allowed. Exact outcome values must appear only in machine-generated verified_results.tex and verified_claims.json artifacts."
+}

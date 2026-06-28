@@ -1,0 +1,51 @@
+{
+  "schema_version": "public-summary-v1",
+  "experiment": "synthetic public-service policy discovery",
+  "reference_run": "run_0",
+  "primary_endpoint": "primary_staff_welfare_composite_post",
+  "primary_endpoint_definition": "0.75 * mechanical_welfare_anchor_post + 0.25 * sealed_survey_welfare_composite_post",
+  "selected_run": "run_3",
+  "selected_label": "capital_deepening_pathway",
+  "baseline_primary_endpoint": 0.4332721888260301,
+  "selected_delta_vs_reference": 0.005479431871758755,
+  "selection_rule": "choose the guardrail-passing candidate with the largest positive primary-endpoint improvement over the reference run",
+  "candidates": [
+    {
+      "run": "run_1",
+      "label": "responsive_management_pathway",
+      "primary_endpoint": 0.43512567774635036,
+      "delta_vs_reference": 0.0018534889203202787,
+      "guardrails_passed": true,
+      "policy_cost_points": 32.4,
+      "service_harm_points": 64970.689685536745
+    },
+    {
+      "run": "run_2",
+      "label": "procedural_justice_pathway",
+      "primary_endpoint": 0.43240879891561074,
+      "delta_vs_reference": -0.0008633899104193432,
+      "guardrails_passed": false,
+      "policy_cost_points": 33.28,
+      "service_harm_points": 64822.72915798168
+    },
+    {
+      "run": "run_3",
+      "label": "capital_deepening_pathway",
+      "primary_endpoint": 0.43875162069778884,
+      "delta_vs_reference": 0.005479431871758755,
+      "guardrails_passed": true,
+      "policy_cost_points": 24.31,
+      "service_harm_points": 64797.95680807639
+    },
+    {
+      "run": "run_4",
+      "label": "direct_staffing_pathway",
+      "primary_endpoint": 0.43661057692307925,
+      "delta_vs_reference": 0.003338388097049172,
+      "guardrails_passed": false,
+      "policy_cost_points": 32.55,
+      "service_harm_points": 66879.19550464551
+    }
+  ],
+  "claim_boundary": "Synthetic simulation evidence only; no real-world causal or policy-effect claim is made."
+}

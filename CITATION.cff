@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: "Public Service Policy Lab: Synthetic policy discovery with multiseed holdout"
+message: "If you use this repository, please cite it as a synthetic research artifact."
+authors:
+  - name: "Public Service Policy Lab contributors"
+version: "0.1.0"
+date-released: "2026-06-28"
+license: "Apache-2.0"

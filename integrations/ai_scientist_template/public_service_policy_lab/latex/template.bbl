@@ -1,0 +1,51 @@
+\begin{thebibliography}{5}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bonabeau(2002)]{bonabeau2002abm}
+Eric Bonabeau.
+\newblock Agent-based modeling: Methods and techniques for simulating human
+  systems.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 99\penalty0
+  (suppl 3):\penalty0 7280--7287, 2002.
+
+\bibitem[{Future of Public Service Young Team}(2022)]{wakate2022}
+{Future of Public Service Young Team}.
+\newblock Toward a colorful public service: A sustainable workplace where
+  everyone can contribute.
+\newblock Cabinet Secretariat / National Personnel Authority young-team
+  proposal, 2022.
+\newblock URL
+  \url{https://www.cas.go.jp/jp/gaiyou/jimu/jinjikyoku/pdf/wakate\_honbun.pdf}.
+\newblock Japanese problem-context source summarized in local
+  source\_cards/wakate2022\_colorful\_public\_service.md; not an adopted policy or
+  causal evaluation.
+
+\bibitem[Kuroki et~al.(2025)Kuroki, Tian, Misaki, Ikegami, Akiba, and
+  Tang]{kuroki2025shachi}
+So~Kuroki, Yingtao Tian, Kou Misaki, Takashi Ikegami, Takuya Akiba, and Yujin
+  Tang.
+\newblock Reimagining agent-based modeling with large language model agents via
+  shachi.
+\newblock \emph{arXiv preprint arXiv:2509.21862}, 2025.
+
+\bibitem[Lu et~al.(2024)Lu, Lu, Lange, Foerster, Clune, and
+  Ha]{lu2024aiscientist}
+Chris Lu, Cong Lu, Robert~Tjarko Lange, Jakob Foerster, Jeff Clune, and David
+  Ha.
+\newblock The {AI} scientist: Towards fully automated open-ended scientific
+  discovery.
+\newblock \emph{arXiv preprint arXiv:2408.06292}, 2024.
+
+\bibitem[Park et~al.(2023)Park, O'Brien, Cai, Morris, Liang, and
+  Bernstein]{Park2023GenerativeAI}
+J.~Park, Joseph O'Brien, Carrie~J. Cai, M.~Morris, Percy Liang, and Michael~S.
+  Bernstein.
+\newblock Generative agents: Interactive simulacra of human behavior.
+\newblock \emph{Proceedings of the 36th Annual ACM Symposium on User Interface
+  Software and Technology}, 2023.
+
+\end{thebibliography}

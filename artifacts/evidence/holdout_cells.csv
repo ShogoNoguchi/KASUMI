@@ -1,0 +1,4 @@
+scenario,seed,guardrails_passed,primary_delta_selected_minus_reference,service_harm_delta_selected_minus_reference,critical_overdue_delta_selected_minus_reference,liability_delta_selected_minus_reference,strain_delta_selected_minus_reference
+reference_stressed,20260631,True,0.006460935623348596,-17.26043105719873,-0.21744922154573487,-9.226060092740227,-0.029698509428790487
+reference_stressed,20260637,True,0.006582768635043645,-26.752328716909688,-0.3473120623661998,-15.172559029197146,-0.037297862177673835
+reference_stressed,20260641,True,0.008533887002909857,-22.58463367271179,-0.28232838006863403,-11.963551288528834,-0.04048972166143017

@@ -1,0 +1,5 @@
+run,label,primary_endpoint,delta_vs_reference,guardrails_passed,policy_cost_points,service_harm_points
+run_1,responsive_management_pathway,0.43512567774635036,0.0018534889203202787,True,32.4,64970.689685536745
+run_2,procedural_justice_pathway,0.43240879891561074,-0.0008633899104193432,False,33.28,64822.72915798168
+run_3,capital_deepening_pathway,0.43875162069778884,0.005479431871758755,True,24.31,64797.95680807639
+run_4,direct_staffing_pathway,0.43661057692307925,0.003338388097049172,False,32.55,66879.19550464551

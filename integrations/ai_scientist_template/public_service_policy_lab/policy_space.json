@@ -1,0 +1,178 @@
+{
+  "schema_version": "1.0",
+  "budget_max_points": 35.0,
+  "baseline_label": "synthetic_stressed_reference_v2",
+  "policy_fields": {
+    "staffing_buffer": {
+      "baseline": 0.0,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 180",
+      "meaning": "Department-level external capacity relative to initial authorized capacity.",
+      "realization_path": "Adds direct department capacity after intervention; it is not personal support.",
+      "dormancy_condition": "None after intervention, but high values are expensive under the budget."
+    },
+    "workload_triage_support": {
+      "baseline": 0.03,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 12",
+      "meaning": "Finite capacity for approved deadline triage requests.",
+      "realization_path": "Changes eligible deadlines only after a request enters and wins the management docket.",
+      "dormancy_condition": "No effect when no eligible triage request is raised or approved."
+    },
+    "manager_support": {
+      "baseline": 0.08,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 8",
+      "meaning": "Finite temporary support envelope allocated by the management gate.",
+      "realization_path": "Approved support creates next-month temporary department capacity and a bounded requester recovery effect.",
+      "dormancy_condition": "No effect without eligible support requests and available docket capacity."
+    },
+    "management_case_capacity": {
+      "baseline": 6,
+      "minimum": 4,
+      "maximum": 12,
+      "cost_rule": "max(0, value-baseline) * 4",
+      "meaning": "Maximum privacy-minimized management docket entries per department per month.",
+      "realization_path": "Increases how many employee requests can enter the monthly management docket. It does not by itself increase support, triage, reform, explanation, or specialist envelopes.",
+      "dormancy_condition": "No effect when request volume is at or below the current docket capacity; approvals still require finite envelopes and identity-valid requests."
+    },
+    "explanation_quality": {
+      "baseline": 0.08,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 5",
+      "meaning": "Capacity for management explanations in response to employee requests.",
+      "realization_path": "Determines a finite number of explanation approvals in the management docket.",
+      "dormancy_condition": "No effect without explanation requests."
+    },
+    "preference_matching": {
+      "baseline": 0.1,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 12",
+      "meaning": "Weight placed on structured employee transfer preferences.",
+      "realization_path": "Changes simultaneous transfer-plan scoring when transfer capacity is positive.",
+      "dormancy_condition": "Dormant when no transfer can occur or no valid preference request exists."
+    },
+    "learning_access_probability": {
+      "baseline": 0.01,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 8",
+      "meaning": "Probability that an employee receives protected learning access in a month.",
+      "realization_path": "A keyed draw grants protected learning time, which then affects time allocation and knowledge accumulation.",
+      "dormancy_condition": "protected_learning_share must be positive for a granted draw to reserve time."
+    },
+    "protected_learning_share": {
+      "baseline": 0.03,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 20",
+      "meaning": "Share of time protected for learning when access is granted.",
+      "realization_path": "Reserves time before the remaining work mix is allocated.",
+      "dormancy_condition": "Dormant when learning access is not granted."
+    },
+    "digital_support": {
+      "baseline": 0.03,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 10",
+      "meaning": "Probability of realized digital-workflow support.",
+      "realization_path": "A keyed draw creates a realized digital event that affects productive capacity and learning mechanisms.",
+      "dormancy_condition": "No effect in months where the draw is not realized."
+    },
+    "process_reform_support": {
+      "baseline": 0.02,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 8",
+      "meaning": "Finite capacity for approving employee process-reform proposals.",
+      "realization_path": "Approved reform requests create bounded process modernization exposure.",
+      "dormancy_condition": "No effect without eligible reform proposals."
+    },
+    "specialist_track_access": {
+      "baseline": 0.02,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 6",
+      "meaning": "Finite access to specialist-career treatment after an employee request.",
+      "realization_path": "Approved requests create identity-bound specialist exposure.",
+      "dormancy_condition": "No effect without specialist-track requests."
+    },
+    "appeal_channel": {
+      "baseline": 0.01,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 4",
+      "meaning": "Probability that an eligible completed transfer receives an appeal channel.",
+      "realization_path": "Applies only after a transfer event and identity-safe event delivery.",
+      "dormancy_condition": "Dormant when no transfers occur."
+    },
+    "hiring_fill_rate": {
+      "baseline": 0.15,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 3",
+      "meaning": "Share of open slots targeted for filling at each hiring interval.",
+      "realization_path": "Caps batch hiring together with hiring_capacity_rate.",
+      "dormancy_condition": "Dormant when there are no open slots."
+    },
+    "hiring_capacity_rate": {
+      "baseline": 0.02,
+      "minimum": 0.0,
+      "maximum": 0.2,
+      "cost_rule": "max(0, value-baseline) * 100",
+      "meaning": "Maximum hires per hiring interval as a share of authorized slots.",
+      "realization_path": "Sets the batch hiring capacity at six-month intervals.",
+      "dormancy_condition": "Dormant when there are no vacancies; values below one hire after flooring may be inactive at small test scale."
+    },
+    "midcareer_hire_share": {
+      "baseline": 0.2,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 2",
+      "meaning": "Share of hires drawn as mid-career profiles.",
+      "realization_path": "Changes profile composition for realized hires.",
+      "dormancy_condition": "Dormant when no hiring occurs."
+    },
+    "transfer_capacity_rate": {
+      "baseline": 0.012,
+      "minimum": 0.0,
+      "maximum": 0.1,
+      "cost_rule": "max(0, value-baseline) * 120",
+      "meaning": "Maximum simultaneous transfers as a share of active staff.",
+      "realization_path": "Sets transfer-plan capacity at six-month intervals.",
+      "dormancy_condition": "May floor to zero in small pilots; full development uses enough staff for positive baseline capacity."
+    },
+    "involuntary_transfer_share": {
+      "baseline": 0.75,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, baseline-value) * 20",
+      "meaning": "Eligibility share for involuntary transfer consideration.",
+      "realization_path": "Changes which active employees can enter involuntary transfer candidates.",
+      "dormancy_condition": "Dormant when transfer capacity is zero."
+    },
+    "transfer_explanation_quality": {
+      "baseline": 0.08,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 4",
+      "meaning": "Probability that a realized transfer includes a credible explanation event.",
+      "realization_path": "Applies after transfer execution and identity-safe event routing.",
+      "dormancy_condition": "Dormant when no transfers occur."
+    },
+    "productivity_savings_capture": {
+      "baseline": 0.55,
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "cost_rule": "max(0, value-baseline) * 1",
+      "meaning": "Share of realized productivity savings converted into capacity rather than absorbed elsewhere.",
+      "realization_path": "Scales the productive effect of realized digital/process modernization.",
+      "dormancy_condition": "Dormant without realized productivity-improving exposure."
+    }
+  }
+}

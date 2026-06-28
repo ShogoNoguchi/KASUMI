@@ -1,0 +1,75 @@
+[
+  {
+    "Name": "mechanism_portfolio_reference",
+    "Title": "Auditable Capacity, Learning, and Mobility Mechanisms in a Synthetic Central-Government Organization",
+    "ResearchQuestion": "Which distinct implementable mechanism package can improve modeled staff welfare without shifting costs into overdue public obligations or unfair transfers?",
+    "Experiment": "Run four exact policy packages that isolate finite management response, protected learning and digital workflow, fair mobility and specialist access, and staffing plus hiring recovery. Compare each with the fixed synthetic reference under matched shocks, freeze any strictly beneficial guardrail-passing winner, and evaluate only that mapping against the reference in unused robustness cells.",
+    "Interventions": [
+      {
+        "Run": 1,
+        "Mechanism": "Finite management response converts employee requests into temporary support, deadline triage, and credible explanation through bounded departmental envelopes.",
+        "ExpectedDirection": "Reduce modeled strain and sealed turnover intent while preserving task completion and service guardrails.",
+        "AdverseEffectPrediction": "Excessive triage may defer difficult work and increase terminal liability even when contemporaneous strain falls.",
+        "Policy": {
+          "label": "finite_management_response",
+          "hypothesis": "A focused finite package of support, triage, and explanation will reduce modeled strain without worsening administrative-service guardrails.",
+          "workload_triage_support": 0.35,
+          "manager_support": 0.45,
+          "explanation_quality": 0.70
+        }
+      },
+      {
+        "Run": 2,
+        "Mechanism": "Protected learning combined with realized digital and process support builds knowledge and delayed productive capacity.",
+        "ExpectedDirection": "Improve knowledge accumulation and sustained post-intervention welfare after an initial protected-time cost.",
+        "AdverseEffectPrediction": "Protected time may raise short-run backlog before productivity and modernization effects accumulate.",
+        "Policy": {
+          "label": "learning_digital_compounding",
+          "hypothesis": "Protected learning and digital-process support will create delayed capacity gains that improve welfare after an initial delivery trade-off.",
+          "learning_access_probability": 0.45,
+          "protected_learning_share": 0.20,
+          "digital_support": 0.65,
+          "process_reform_support": 0.45,
+          "productivity_savings_capture": 0.75
+        }
+      },
+      {
+        "Run": 3,
+        "Mechanism": "Preference-aware transfer planning, explanation, appeal, and specialist access improve mobility fit and procedural experience.",
+        "ExpectedDirection": "Reduce unfair involuntary movement and improve welfare among employees with high family constraints.",
+        "AdverseEffectPrediction": "Restricting involuntary movement may leave high-pressure recipient departments understaffed or reduce skill balancing.",
+        "Policy": {
+          "label": "fair_mobility_and_specialism",
+          "hypothesis": "Preference-aware mobility with explanation, appeal, and specialist access will improve procedural welfare without breaching service guardrails.",
+          "preference_matching": 0.75,
+          "specialist_track_access": 0.45,
+          "appeal_channel": 0.55,
+          "transfer_capacity_rate": 0.04,
+          "involuntary_transfer_share": 0.25,
+          "transfer_explanation_quality": 0.80
+        }
+      },
+      {
+        "Run": 4,
+        "Mechanism": "External staffing buffer and stronger hiring replenish capacity while complementary support and learning reduce transition strain.",
+        "ExpectedDirection": "Lower backlog and exit pressure through sustained headcount replacement and added productive capacity.",
+        "AdverseEffectPrediction": "Rapid hiring may dilute tacit knowledge and raise coordination costs before new staff mature.",
+        "Policy": {
+          "label": "staffing_and_hiring_recovery",
+          "hypothesis": "A resource-intensive staffing and hiring package will restore capacity and reduce exit pressure, with possible short-run knowledge dilution.",
+          "staffing_buffer": 0.08,
+          "workload_triage_support": 0.25,
+          "manager_support": 0.35,
+          "learning_access_probability": 0.25,
+          "digital_support": 0.35,
+          "hiring_fill_rate": 0.75,
+          "hiring_capacity_rate": 0.08,
+          "midcareer_hire_share": 0.55
+        }
+      }
+    ],
+    "Interestingness": 8,
+    "Feasibility": 9,
+    "Novelty": 7
+  }
+]

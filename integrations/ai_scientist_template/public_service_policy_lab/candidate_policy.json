@@ -1,0 +1,8 @@
+{
+  "label": "direct_staffing_pathway",
+  "hypothesis": "A direct and substantial increase in headcount is the most effective way to resolve the capacity crisis, reduce staff burnout, and restore service delivery.",
+  "staffing_buffer": 0.12,
+  "hiring_capacity_rate": 0.1,
+  "hiring_fill_rate": 0.8,
+  "midcareer_hire_share": 0.7
+}

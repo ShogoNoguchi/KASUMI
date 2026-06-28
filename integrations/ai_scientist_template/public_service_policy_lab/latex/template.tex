@@ -1,0 +1,191 @@
+\documentclass{article}
+\usepackage{iclr2024_conference,times}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{cleveref}
+
+\graphicspath{{../figures/}{../}}
+
+\begin{filecontents}{references.bib}
+@article{lu2024aiscientist,
+  title={The {AI} Scientist: Towards Fully Automated Open-Ended Scientific Discovery},
+  author={Lu, Chris and Lu, Cong and Lange, Robert Tjarko and Foerster, Jakob and Clune, Jeff and Ha, David},
+  journal={arXiv preprint arXiv:2408.06292},
+  year={2024}
+}
+
+@article{kuroki2025shachi,
+  title={Reimagining Agent-based Modeling with Large Language Model Agents via Shachi},
+  author={Kuroki, So and Tian, Yingtao and Misaki, Kou and Ikegami, Takashi and Akiba, Takuya and Tang, Yujin},
+  journal={arXiv preprint arXiv:2509.21862},
+  year={2025}
+}
+
+@article{bonabeau2002abm,
+  title={Agent-based modeling: Methods and techniques for simulating human systems},
+  author={Bonabeau, Eric},
+  journal={Proceedings of the National Academy of Sciences},
+  volume={99},
+  number={suppl 3},
+  pages={7280--7287},
+  year={2002}
+}
+
+@misc{wakate2022,
+  title={Toward a Colorful Public Service: A Sustainable Workplace Where Everyone Can Contribute},
+  author={{Future of Public Service Young Team}},
+  howpublished={Cabinet Secretariat / National Personnel Authority young-team proposal},
+  year={2022},
+  url={https://www.cas.go.jp/jp/gaiyou/jimu/jinjikyoku/pdf/wakate\_honbun.pdf},
+  note={Japanese problem-context source summarized in local source\_cards/wakate2022\_colorful\_public\_service.md; not an adopted policy or causal evaluation}
+}
+
+@Article{Park2023GenerativeAI,
+ author = {J. Park and Joseph O'Brien and Carrie J. Cai and M. Morris and Percy Liang and Michael S. Bernstein},
+ booktitle = {ACM Symposium on User Interface Software and Technology},
+ journal = {Proceedings of the 36th Annual ACM Symposium on User Interface Software and Technology},
+ title = {Generative Agents: Interactive Simulacra of Human Behavior},
+ year = {2023}
+}
+
+\end{filecontents}
+
+\title{Pathways from a Synthetic Public-Service Crisis: A Comparative Experiment on Management, Justice, Capital, and Staffing Interventions}
+\author{The AI Scientist\\Synthetic Public-Administration Simulation}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Public-service organizations under extreme strain require effective recovery strategies, but testing interventions in the real world is difficult. We introduce a synthetic mechanism experiment using an agent-based model, where LLM agents act as employees within a Python-coded bureaucracy, to contrast four distinct policy pathways: responsive management, procedural justice, direct staffing, and capital deepening. Against a stressed reference scenario, a capital-deepening pathway that invested in employee learning and digital tools proved the most effective of the four interventions. It was selected for delivering the greatest improvement in staff welfare among candidates passing all preregistered service-delivery and fairness guardrails. The robustness of this finding was confirmed in synthetic holdout runs with new random seeds. While this work demonstrates a method for exploring complex policy trade-offs in a controlled setting, its findings identify mechanisms operative within the synthetic organization and are not causal estimates or policy recommendations for real-world ministries.
+\end{abstract}
+
+\section{Introduction}
+Public-service organizations must navigate complex reforms to address chronic workload strain and prevent service degradation. While proposals often target distinct mechanisms such as management responsiveness, procedural justice, direct staffing, or productivity investment \citep{wakate2022}, evaluating their effectiveness is challenging. Organizational recovery is a dynamic process where feedback loops and temporal trade-offs are critical; for example, an intervention might impose short-term costs for long-term gains, an effect that static analysis can miss. This difficulty motivates the use of agent-based modeling to study these dynamics in a controlled, synthetic environment.
+
+We conduct a synthetic mechanism experiment using an agent-based model built with the Shachi framework \citep{kuroki2025shachi}. In our model, a synthetic bureaucracy is populated by employees represented as LLM agents. These agents make monthly, schema-constrained decisions based on local observations, while a Python-coded environment governs organizational physics like tasks, deadlines, and management approvals. This simulation serves as a testbed to trace the multi-year consequences of different policy regimes. Using The AI Scientist framework \citep{lu2024aiscientist}, we design and compare four distinct policy interventions against a stressed reference scenario, each representing a coherent theory of organizational recovery.
+
+Within this synthetic environment, a `capital deepening' pathway that invested in employee learning and productivity tools emerged as the most successful intervention. It was selected over the only other eligible candidate, `responsive management', for delivering a greater improvement in staff welfare. The remaining two pathways were disqualified for breaching preregistered service or fairness guardrails. This outcome highlights the importance of modeling dynamic effects, as the benefits of the selected policy accumulated over time. Crucially, our findings identify mechanisms inside a declared synthetic model and are not causal estimates of policy effects in real ministries or validated claims about actual civil servants.
+
+This paper makes the following contributions:
+\begin{enumerate}
+    \item We introduce a dynamic, agent-based model of a public-service organization that combines a deterministic Python state-transition system with boundedly rational LLM-based agents.
+    \item We conduct a comparative experiment on four distinct, AI-designed policy pathways for organizational recovery, evaluated under matched environmental shocks.
+    \item We provide synthetic evidence that long-term investment in productivity and capability can be more effective at breaking cycles of work strain and service failure than direct increases in management capacity or staffing.
+    \item We demonstrate a workflow combining The AI Scientist and Shachi to automate the exploration of complex socio-technical systems and generate testable hypotheses for empirical public-administration research.
+\end{enumerate}
+
+\section{Related Work and Problem Context}
+Our work integrates advances in agent-based modeling, large language models (LLMs), and automated experiment design to explore a problem grounded in public-administration reform.
+
+\textbf{Agent-Based Modeling (ABM)} has a long history of use for simulating complex social and economic systems that are difficult to capture with aggregate models \citep{bonabeau2002abm}. By representing individual actors and their interactions, ABM can reveal emergent, system-level dynamics and feedback loops. Traditional ABMs, however, often rely on simplified, rule-based agents, which can limit the behavioral richness of the simulation.
+
+\textbf{LLM-based Agents} represent a significant evolution, allowing for more nuanced, context-aware behaviors than traditional rule-based agents without requiring hand-coded logic for every contingency \citep{Park2023GenerativeAI}. This flexibility, however, introduces challenges in reproducibility and control. The \textbf{Shachi} framework mitigates these issues by enforcing a strict separation: LLM agents make bounded, structured choices based on controlled observations, but the Python code, not the LLM, owns all state transitions and organizational ``physics'' \citep{kuroki2025shachi}. This hybrid approach retains the behavioral richness of LLMs while ensuring the simulation's causal pathways are explicit and reproducible.
+
+\textbf{Automated Experiment Design} is facilitated by \textbf{The AI Scientist} framework, which automates the cycle of proposing hypotheses, designing interventions, and analyzing results \citep{lu2024aiscientist}. We use it here to translate the high-level research question of organizational recovery into four distinct, coherent, and machine-testable policy packages. This enables a more systematic exploration of the policy space than manual specification would allow.
+
+\textbf{Problem Context in Public Administration.} The mechanisms we explore are motivated by real-world challenges. A 2022 proposal from a young-career team in the Japanese government, for instance, highlights issues of work-life balance, opaque career paths, management quality, and the need for digital tools as critical for a sustainable public service \citep{wakate2022}. We use this proposal as a source of policy-relevant mechanism vocabulary---motivating dimensions like management capacity, transfer preferences, and learning opportunities---but not to calibrate model parameters or estimate real-world effects. This distinction is critical: our contribution is a synthetic exploration of policy mechanisms, entirely separate from empirical claims about civil-servant behavior or the effectiveness of interventions in any real ministry.
+
+\section{Dynamic Bureaucracy Model}
+Our model separates agent decision-making from environmental dynamics: employees are LLM-based agents making bounded, structured choices, while a deterministic Python environment manages the organizational ``physics'' and state transitions.
+
+\paragraph{Employee Agent Decision-Making}
+Each month, active employees, represented by LLM agents, receive a privacy-bounded observation of their local conditions: departmental workload, deadlines, personal memory of facts, and their synthetic profile attributes. Based on this, each agent produces a single, schema-constrained action. Agents choose their relative effort and how to allocate their time across core work, coordination, learning, and process improvement. They can also make specific requests, such as asking for support, seeking an explanation, proposing a process reform, or indicating a preference for an internal transfer. Agents do not control absolute output, task arrivals, or management approvals.
+
+In addition, agents provide contemporaneous self-reports on metrics like fatigue, trust, and turnover intent. This self-report channel is sealed for evaluation: it does not influence the agent's future observations, management priorities, or the simulation's causal state transitions.
+
+\paragraph{Python-Owned Environment Dynamics}
+The Python environment governs the organization's structure and processes. It maintains a workforce of 120 authorized slots with dynamic person identities and identity epochs. This system ensures that all events and management actions are identity-safe---keyed to a specific person in a specific slot at a specific time---and cannot be misapplied to a departed employee's replacement.
+
+Work arrives as exogenous, deadline-bearing task cohorts, each with attributes for criticality and potential public service harm. The environment converts agent effort into work units, models quality errors that generate rework, and tracks service outcomes through ledgers for completed work, overdue units, service harm points, and terminal liability. It also models employee work strain and the accumulation of tacit and formal knowledge.
+
+Staffing dynamics are also managed by Python. This includes a competing-risk model for employee exits, batch hiring into vacant slots at six-month intervals, and a system for simultaneous, capacity-constrained internal transfers that considers both organizational needs and employee preferences.
+
+\paragraph{Deterministic Management Allocator}
+A deterministic management process is a critical component for ensuring clear causal pathways. Each month, employee requests are aggregated into a privacy-minimized docket per department. A deterministic allocator then processes a finite number of these requests according to a fixed priority rule---the baseline capacity is six cases per department---and fulfills them from separate, finite envelopes for support, triage, explanation, and reform. This design ensures that management attention is a scarce resource through which policy interventions must operate. While an optional LLM-based manager exists, the primary experiment relies on this deterministic system.
+
+\section{Matched Experimental Design}
+We evaluate four policy interventions against a common baseline using a matched design where the treatment unit is the entire simulated organization's 48-month trajectory. All development and robustness stages described here were executed.
+
+\paragraph{Development Comparison}
+The experiment compares five parallel simulations: a stressed reference condition (\texttt{run\_0}) and four interventions (\texttt{run\_1}--\texttt{run\_4}) that test policies for Management Debottlenecking, Procedural Justice, Capital Deepening, and Direct Staffing. To isolate the policy effect, all runs share an identical setup: a 48-month horizon, a 12-month warm-up before policy activation, matched environmental shocks from a single development seed, and an identical warm-up cache. All underlying model settings, including agent prompts and state-transition equations, are held constant across arms.
+
+\paragraph{Preregistered Selection}
+An immutable, preregistered selection rule governs the comparison. To be selected, an intervention must strictly improve a primary composite welfare endpoint over the baseline. It must also pass all service-delivery and fairness guardrails, which place upper bounds on adverse outcomes like service harm points, critical overdue work, and involuntary transfers of staff with high family constraints. This rule ensures that welfare gains do not come at the cost of unacceptable degradation in public service.
+
+\paragraph{Synthetic Robustness Check}
+After the development comparison selected a single winning candidate, its robustness was checked by re-running the policy against the baseline on multiple new, previously unused random seeds. This stage serves as a synthetic robustness check on the mechanism's effectiveness under different stochastic conditions within the model; it is not a holdout for re-selection or a basis for claims of real-world external validity.
+
+\section{Results}
+Our preregistered experiment evaluated four policies in its development phase. The outcomes are detailed in Table~1 and summarized below:
+\begin{itemize}
+    \item \textbf{Capital Deepening (\texttt{run\_3}): Selected.} Passed all guardrails and delivered the greatest improvement to staff welfare.
+    \item \textbf{Responsive Management (\texttt{run\_1}): Eligible but not selected.} Passed all guardrails but with a smaller welfare improvement.
+    \item \textbf{Direct Staffing (\texttt{run\_4}): Ineligible.} Improved welfare but breached a service guardrail on critical overdue work.
+    \item \textbf{Procedural Justice (\texttt{run\_2}): Ineligible.} Failed to improve welfare and breached a fairness guardrail on involuntary transfers.
+\end{itemize}
+
+This selection proved robust in synthetic holdout runs. In repeated comparisons on new random seeds, the Capital Deepening pathway consistently improved staff welfare over the baseline while satisfying all guardrails.
+
+\IfFileExists{../verified\_results.tex}{\input{../verified\_results.tex}}{\textit{Verified result table will be inserted after completed runs.}}
+
+\begin{figure}[t]
+  \centering
+  \IfFileExists{../figures/headcount_trajectory.png}{%
+    \includegraphics[width=0.95\textwidth]{headcount_trajectory.png}%
+  }{\fbox{\parbox{0.9\textwidth}{Headcount figure will be inserted after the matched runs and plot step.}}}
+  \caption{Active headcount remained stable across most interventions, reflecting baseline attrition and hiring patterns. The Direct Staffing pathway (\texttt{run\_4}) substantially increased headcount as intended, but this did not translate into a successful outcome under the preregistered selection rule.}
+  \label{fig:headcount}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \IfFileExists{../figures/backlog_trajectory.png}{%
+    \includegraphics[width=0.95\textwidth]{backlog_trajectory.png}%
+  }{\fbox{\parbox{0.9\textwidth}{Backlog figure will be inserted after the matched runs and plot step.}}}
+  \caption{Departmental backlog trajectories illustrate the different temporal dynamics of each intervention. The selected Capital Deepening pathway (\texttt{run\_3}) initially tracked the baseline backlog before its productivity benefits began to accumulate, demonstrating a trade-off between short-term implementation costs and long-term recovery.}
+  \label{fig:backlog}
+\end{figure}
+
+\section{Mechanism Diagnostics and Trade-offs}
+Analyzing why the Capital Deepening pathway succeeded while others failed reveals critical trade-offs in how organizational capacity is developed and managed. The results suggest that sustainable recovery depends on improving the productivity of the existing workforce, not just increasing headcount or processing more requests.
+
+The selected \textbf{Capital Deepening} pathway (\texttt{run\_3}) exemplifies a trade-off between short-term costs and long-term gains. By investing in protected learning time and digital tools, it improved the underlying productive capacity of its staff. This investment incurred an initial cost, visible in the backlog trajectory (\Cref{fig:backlog}) which initially lags the baseline, but it led to a sustained recovery in both service delivery and staff welfare. This pathway created durable capacity without relying on external hiring or simply deferring work.
+
+The failed interventions highlight the risks of other approaches. The \textbf{Direct Staffing} pathway (\texttt{run\_4}) illustrates that merely adding headcount is insufficient. While it successfully increased the number of employees (\Cref{fig:headcount}), it breached the service guardrail for critical overdue work. This outcome supports its predicted adverse effect: a rapid influx of new staff can increase coordination overhead and dilute institutional knowledge, offsetting the benefits of a larger workforce.
+
+The remaining two pathways show the limits of treating symptoms without addressing the root cause. \textbf{Responsive Management}\ (\texttt{run\_1}), while beneficial, demonstrated that clearing approval bottlenecks is not a substitute for productive capacity; it reduced request backlogs but did not generate a comparable welfare gain. \textbf{Procedural Justice}\ (\texttt{run\_2}) showed that improving one process in isolation can backfire. Its narrow focus on transfer fairness failed to relieve overwork and ironically led to a breach of a fairness guardrail protecting a vulnerable employee subgroup.
+
+\section{Limitations and External Validation}
+The findings of this study must be interpreted within the strict boundaries of its synthetic design.
+
+\paragraph{Synthetic Environment} The model is not an empirical calibration; its components, including employee profiles, task mix, exit hazards, and policy effect sizes, are synthetic constructs. Consequently, the results cannot be interpreted as causal estimates for any actual ministry or as representations of real civil-servant behavior.
+
+\paragraph{Model-Generated Data} The behavioral outputs, including employee actions and self-reports on fatigue and trust, are LLM-generated data. They should not be interpreted as validated measures of human psychology or sentiment.
+
+\paragraph{Adaptive Development and Robustness} The development process is adaptive, using a single seed to identify promising mechanisms. The subsequent runs on new seeds provide a synthetic robustness check within the model's world, not a statistical claim of generalizability. The additional seed checks are robustness checks within the synthetic model world. They do not constitute empirical external validation and do not support real-world generalizability claims.
+
+\paragraph{Path to External Validation} Translating these synthetic findings into real-world policy requires extensive external validation. Any hypotheses generated by this work would need to be tested with traditional empirical methods---including analysis of administrative records, surveys, qualitative evidence, legal review, and prospective evaluation---before being considered for implementation.
+
+\section{Conclusion}
+Our synthetic experiment suggests that investing in long-term productive capacity is a more sustainable path to organizational recovery than policies that address symptoms like management bottlenecks or simply increase headcount. The Capital Deepening pathway, which focused on employee learning and digital tools, was selected over three alternatives for delivering the greatest improvement in staff welfare among candidates that passed all service and fairness guardrails.
+
+Methodologically, our work demonstrates how combining agent-based modeling (Shachi) with automated experiment design (The AI Scientist) can reveal dynamic trade-offs, such as the short-term costs and long-term benefits of productivity investments \citep{lu2024aiscientist,kuroki2025shachi}.
+
+These findings are hypotheses generated within a synthetic world, not policy recommendations for the real one. The next step is to take these specific, model-derived insights into the field. Empirical research is needed to test whether the temporal trade-offs identified in our simulation---such as an initial performance dip for training followed by a sustained recovery---hold in a real administrative setting. Our work provides a clear, testable hypothesis about which mechanisms may be most critical to measure in future studies of public-administration reform.
+
+\bibliographystyle{iclr2024_conference}
+\bibliography{references}
+\end{document}

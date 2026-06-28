@@ -1,0 +1,11 @@
+{
+  "name": "public-service-policy-lab",
+  "created_from": "sanitized public evidence and task-extension source",
+  "claim_boundary": "synthetic simulation evidence only",
+  "selected_policy": "capital_deepening_pathway",
+  "holdout_cells": 3,
+  "review_recommendations": [
+    "accept_poc",
+    "accept_poc"
+  ]
+}

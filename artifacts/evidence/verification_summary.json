@@ -1,0 +1,16 @@
+{
+  "schema_version": "public-summary-v1",
+  "final_paper_sha256": "5a1d6c93f273c4ba2d5cc2142ee98d48e19eb2fe5ad2e0a44c9e0375bb0c3808",
+  "claim_verification_passed": true,
+  "claim_verification_sha256": "6388e15bd353ddc4cddde0ac7d38e1e1c27ef25182937f81efd0850857eab161",
+  "verified_claim_count": 153,
+  "holdout_cells": 3,
+  "latex_gate_passed": true,
+  "text_gate_passed": true,
+  "numeric_audit_passed": true,
+  "review_recommendations": [
+    "accept_poc",
+    "accept_poc"
+  ],
+  "claim_boundary": "Final manuscript reports synthetic development and frozen holdout evidence only."
+}

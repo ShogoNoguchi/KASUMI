@@ -1,0 +1,15 @@
+{
+  "version": "1.4.5",
+  "package_hash": "a9aa0ea1d11dbf0d9a57fbf52a65d1812bf883b2f6bb31e10288f32196fff06c",
+  "package_hash_algorithm": "sha256(relative_path\\0bytes\\0)",
+  "package_hash_excludes": [
+    "**/release_fingerprint.json",
+    "FILE_SHA256SUMS.txt",
+    ".git/**",
+    "**/__pycache__/**",
+    "**/*.pyc",
+    "**/.validation_*/**"
+  ],
+  "shachi_ref": "c6c8f2232948a0a16bd8c08a6d3654d892acd3dc",
+  "ai_scientist_ref": "1de1dbc1f4ee2c5f61e9c94348d55eb51d7fa2eb"
+}

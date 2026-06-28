@@ -1,0 +1,110 @@
+package:
+  name: japan_policy_scientist
+  version: 1.4.5
+  profile: adaptive_api_local_fast_track_no_holdout
+experiment:
+  fixed_seed: 20260619
+  scenario: reference_stressed
+  num_agents: 120
+  months: 48
+  warmup_months: 12
+  intervention_start_month: 13
+  hiring_interval_months: 6
+  transfer_interval_months: 6
+  default_intervention_runs: 4
+  required_run_names:
+  - run_0
+  - run_1
+  - run_2
+  - run_3
+  - run_4
+  holdout_scenarios: []
+  holdout_seeds: []
+  fast_track_no_holdout: true
+  scale_profile: adaptive_120slot_48month_no_holdout
+management:
+  mode: deterministic_priority
+  optional_llm_ablation: true
+llm:
+  model: gemini/gemini-2.5-flash-lite
+  temperature: 0.0
+  reasoning_effort: none
+  max_concurrency: 4
+  network_retries: 16
+  validation_retries: 3
+  retry_sleep_seconds: 10.0
+  monthly_output_token_estimate: 700
+  quarterly_output_token_estimate: 700
+  manager_output_token_estimate: 700
+  live_call_spacing_seconds: 0.0
+  rate_limit_profile: adaptive_token_bucket_flash_lite_or_local
+  employee_monthly_backend: representative_cohort
+  gemini_batch_enabled: true
+  local_openai_fallback_enabled: true
+  gemini_batch_chunk_size: 128
+  local_openai_fallback_order:
+  - z_awq_marlin
+  - jupyter_llamacpp
+  - csl_llamacpp
+  enable_quarterly_reflections: false
+  representative_cohort_backend: adaptive_live
+  representative_cohort_granularity: coarse
+  representative_cohort_max_groups_per_month: 12
+memory:
+  monthly_window: 2
+  quarterly_window: 1
+  fact_window: 8
+  manager_fact_window: 6
+  include_prior_self_report_numbers: false
+behavioral_pilot:
+  name: mechanism_non_dormancy_gate
+  paired_profiles: 20
+  min_valid_pair_rate: 1.0
+  min_stress_fatigue_increase_share: 0.6
+  min_stress_turnover_increase_share: 0.55
+  min_health_protecting_action_share_under_stress: 0.0
+  min_distinct_work_responses_under_stress: 1
+  max_identical_action_pair_share: 0.85
+  min_stress_effort_decrease_share: 0.0
+  min_stress_effort_le_85_share: 0.0
+bureaucratic_identity_gate:
+  minimum_pass_rate: 1.0
+  required_vignettes: 6
+  output_token_estimate_per_vignette: 700
+policy_budget:
+  max_points: 35.0
+  description: Synthetic design-complexity and implementation-burden regularizer visible
+    to The AI Scientist; not fiscal cost, API spend, or a budget estimate.
+selection:
+  primary_endpoint: primary_staff_welfare_composite_post
+  primary_endpoint_formula: 0.75 * mechanical_welfare_anchor_post + 0.25 * sealed_survey_welfare_composite_post
+  sealed_survey_weight: 0.25
+  survey_firewall_required: true
+  survey_feedback_to_future_prompt: false
+  guardrails:
+  - cumulative_service_harm_points_post
+  - mean_critical_overdue_units_post
+  - terminal_liability_points
+  - initial_high_family_involuntary_transfer_rate
+  tie_breakers:
+  - cumulative_service_harm_points_post
+  - policy_implementation_cost_points
+execution_strategy:
+  description: current public release keeps the 48-month horizon, 12-month warmup, and exact run_0..run_4
+    comparison, disables holdout/submission-pilot, and uses representative cohorts
+    with adaptive live Gemini, Gemini Batch, or local OpenAI-compatible backends.
+    The default fast-track profile targets 120 slots and 12 representative cohorts/month.
+  baseline_target_employee_month_calls: 5760
+  five_arm_target_employee_month_calls_with_warmup_reuse_estimate: 23040
+  reference_comparison: EconAgent uses 100 agents and period barriers, while Shachi
+    bureaucracy uses richer structured actions. current public release keeps 48 months and run_0..run_4
+    but reduces slots and replaces one paid live call per agent-step with representative
+    cohorts plus batch/local backends.
+urgent_scale_profile:
+  name: adaptive_120_agents_48_months_no_holdout
+  rationale: Preserve 48 months and the 36-month policy window while reducing direct
+    employee-month volume; representative cohort max groups defaults to 12/month for
+    weekend execution.
+  reference_comparison: 'Closer to existing LLM-ABM call design: period barriers plus
+    representative/cohort decisions rather than one live API call per employee-step.'
+  holdout_disabled: true

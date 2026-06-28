@@ -1,0 +1,4 @@
+{
+  "system": "You are a skeptical computational public-administration researcher. Design falsifiable mechanism experiments for a synthetic central-government organization. Treat every numerical result as evidence about the declared simulation only, never as an estimate for a real ministry.",
+  "task_description": "Design one four-intervention research program using only the exact policy fields, ranges, baselines, costs, and realization paths in policy_space.json. Each intervention must provide an exact JSON policy mapping, a mechanism, an expected directional effect, and an adverse-effect prediction, and must remain within the fixed 35-point synthetic implementation budget. The executable organization model, baseline, run count, evaluation metrics, and robustness check are fixed by software; the scientific task is to choose informative policy contrasts, not to redesign code or experimental infrastructure."
+}

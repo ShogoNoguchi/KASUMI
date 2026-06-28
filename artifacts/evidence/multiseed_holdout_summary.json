@@ -1,0 +1,49 @@
+{
+  "schema_version": "public-summary-v1",
+  "selected_run": "run_3",
+  "selected_label": "capital_deepening_pathway",
+  "reselection_performed": false,
+  "all_holdout_guardrails_passed": true,
+  "n_holdout_cells": 3,
+  "aggregate": {
+    "primary_delta_mean": 0.007192530420434033,
+    "service_harm_delta_mean": -22.19913114894007,
+    "critical_overdue_delta_mean": -0.28236322132685626,
+    "liability_delta_mean": -12.120723470155403,
+    "strain_delta_mean": -0.03582869775596483,
+    "turnover_intent_delta_mean": -0.051898331104899824
+  },
+  "cells": [
+    {
+      "scenario": "reference_stressed",
+      "seed": 20260631,
+      "guardrails_passed": true,
+      "primary_delta_selected_minus_reference": 0.006460935623348596,
+      "service_harm_delta_selected_minus_reference": -17.26043105719873,
+      "critical_overdue_delta_selected_minus_reference": -0.21744922154573487,
+      "liability_delta_selected_minus_reference": -9.226060092740227,
+      "strain_delta_selected_minus_reference": -0.029698509428790487
+    },
+    {
+      "scenario": "reference_stressed",
+      "seed": 20260637,
+      "guardrails_passed": true,
+      "primary_delta_selected_minus_reference": 0.006582768635043645,
+      "service_harm_delta_selected_minus_reference": -26.752328716909688,
+      "critical_overdue_delta_selected_minus_reference": -0.3473120623661998,
+      "liability_delta_selected_minus_reference": -15.172559029197146,
+      "strain_delta_selected_minus_reference": -0.037297862177673835
+    },
+    {
+      "scenario": "reference_stressed",
+      "seed": 20260641,
+      "guardrails_passed": true,
+      "primary_delta_selected_minus_reference": 0.008533887002909857,
+      "service_harm_delta_selected_minus_reference": -22.58463367271179,
+      "critical_overdue_delta_selected_minus_reference": -0.28232838006863403,
+      "liability_delta_selected_minus_reference": -11.963551288528834,
+      "strain_delta_selected_minus_reference": -0.04048972166143017
+    }
+  ],
+  "claim_boundary": "Synthetic holdout evidence only; no external-validity or real-world policy claim is made."
+}
