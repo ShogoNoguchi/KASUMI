@@ -1,4 +1,4 @@
-"""Public Service Policy Lab: synthetic policy-discovery replay utilities."""
+"""KASUMI: synthetic bureaucratic personnel-policy replay utilities."""
 
 __all__ = ["__version__"]
 __version__ = "0.1.0"

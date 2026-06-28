@@ -1,11 +1,11 @@
 [project]
 name = "public-service-policy-lab"
 version = "0.1.0"
-description = "Synthetic public-service policy discovery and multiseed holdout replay utilities"
+description = "Autonomous AI-scientist replay utilities for synthetic bureaucratic personnel policy research"
 requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "Apache-2.0"}
-authors = [{name = "Public Service Policy Lab contributors"}]
+authors = [{name = "KASUMI contributors"}]
 dependencies = [
   "pydantic>=2",
   "matplotlib>=3.8",

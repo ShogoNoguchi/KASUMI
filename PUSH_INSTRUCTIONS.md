@@ -16,7 +16,7 @@ pytest -q
 
 git init
 git add .
-git commit -m "Initial public release of synthetic public-service policy lab"
+git commit -m "Initial public release of KASUMI"
 git branch -M main
 git remote add origin git@github.com:<YOUR_USER_OR_ORG>/<REPO_NAME>.git
 git push -u origin main

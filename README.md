@@ -8,14 +8,15 @@
   <img alt="config" src="https://img.shields.io/badge/config-YAML-informational">
 </p>
 
-# Public Service Policy Lab
+# KASUMI: An Autonomous AI Scientist for Bureaucratic Personnel Policy
 
-**Public Service Policy Lab** is a synthetic policy-science workflow for
-exploring organizational recovery strategies in a simulated public-service
-environment. A foundation-model research agent proposes candidate policy
-programs, a Shachi-style agent-based simulation evaluates them, a frozen
-multiseed holdout checks the selected policy, and an AI Scientist-style writing
-and review stage turns the evidence into a paper.
+**KASUMI** is a synthetic policy-science workflow for studying bureaucratic
+personnel policy in a simulated public-service organization. A foundation-model
+research agent proposes staffing, transfer, training, and digital-support
+programs; a Shachi-style agent-based simulation evaluates organizational
+recovery under stress; a frozen multiseed holdout checks the selected policy;
+and an AI Scientist-style writing and review stage turns the verified evidence
+into an anonymous paper.
 
 > Claim boundary: this repository reports synthetic simulation evidence only. It
 > is not a policy recommendation, a real-world causal estimate, a personnel
@@ -23,12 +24,12 @@ and review stage turns the evidence into a paper.
 
 <!-- HERO IMAGE PLACEHOLDER
 Insert a generated hero image here.
-Prompt: "A clean scientific dashboard for synthetic public-service policy discovery: translucent layers labelled Idea Generation, Agent-Based Simulation, Multiseed Holdout, Verified Claims, and Automated Review; calm blue-white palette; subtle civic architecture silhouettes; no company logos; title text 'Public Service Policy Lab' centered; modern research-lab aesthetic; high resolution 16:9."
+Prompt: "A clean scientific dashboard for bureaucratic personnel policy discovery: translucent layers labelled Staffing Ideas, Transfer Design, Agent-Based Bureaucracy Simulation, Multiseed Holdout, Verified Claims, and Automated Review; calm blue-white palette; subtle Kasumigaseki-style civic architecture silhouettes; no company logos; title text 'KASUMI' centered; modern research-lab aesthetic; high resolution 16:9."
 -->
 
-## What this repo demonstrates
+## What KASUMI demonstrates
 
-1. **Policy discovery.** Four candidate interventions are compared against a stressed reference organization.
+1. **Personnel-policy discovery.** Four staffing, transfer, training, and support interventions are compared against a stressed reference organization.
 2. **Guardrail-aware selection.** The selected candidate must improve a preregistered staff-welfare endpoint while passing service and fairness guardrails.
 3. **Frozen multiseed holdout.** The selected policy is evaluated against the reference condition on new random seeds without reselection.
 4. **Evidence-bound writing.** The final paper is supported by machine-readable claim verification, numeric audit, and automated review artifacts.
@@ -126,11 +127,12 @@ release. It does not attempt to open an upstream PR automatically.
 
 The README and Pages site are designed with one hero image slot. Use this prompt:
 
-> A clean scientific dashboard for synthetic public-service policy discovery:
-> translucent layers labelled Idea Generation, Agent-Based Simulation, Multiseed
-> Holdout, Verified Claims, and Automated Review; calm blue-white palette; subtle
-> civic architecture silhouettes; no company logos; title text "Public Service
-> Policy Lab" centered; modern research-lab aesthetic; high resolution 16:9.
+> A clean scientific dashboard for bureaucratic personnel policy discovery:
+> translucent layers labelled Staffing Ideas, Transfer Design, Agent-Based
+> Bureaucracy Simulation, Multiseed Holdout, Verified Claims, and Automated
+> Review; calm blue-white palette; subtle Kasumigaseki-style civic architecture
+> silhouettes; no company logos; title text "KASUMI" centered; modern
+> research-lab aesthetic; high resolution 16:9.
 
 ## Limitations
 

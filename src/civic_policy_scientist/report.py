@@ -11,7 +11,7 @@ def write_markdown_report(bundle: EvidenceBundle, figure_dir: Path, out_path: st
     hold = bundle.holdout
     ver = bundle.verification
     lines = [
-        "# Public Service Policy Lab replay report",
+        "# KASUMI replay report",
         "",
         "This report is generated deterministically from the public evidence bundle.",
         "It summarizes synthetic simulation results only and makes no real-world causal claim.",
