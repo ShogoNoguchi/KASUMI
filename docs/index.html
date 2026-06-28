@@ -3,55 +3,299 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KASUMI: Bureaucratic Personnel Policy AI Scientist</title>
+  <title>KASUMI: Autonomous AI Scientist for Bureaucratic Personnel Policy</title>
+  <meta name="description" content="KASUMI is a synthetic AI-scientist workflow for bureaucratic personnel policy: staffing ideas, transfer design, LLM-agent ABM, holdout, verified claims, and automated review.">
+  <meta property="og:title" content="KASUMI">
+  <meta property="og:description" content="An autonomous AI scientist for synthetic bureaucratic personnel policy research.">
+  <meta property="og:image" content="assets/kasumi-hero.png">
   <style>
-    :root { --bg:#07111f; --fg:#e8f0ff; --muted:#9fb2d1; --card:#101d32; --accent:#6db7ff; }
-    body { margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; background:linear-gradient(135deg,#06101d,#10223d 58%,#122d48); color:var(--fg); }
-    .wrap { max-width:1100px; margin:0 auto; padding:56px 24px; }
-    .hero { display:grid; grid-template-columns:1.2fr .8fr; gap:28px; align-items:center; }
-    .badge { display:inline-block; padding:7px 10px; border:1px solid rgba(255,255,255,.16); border-radius:999px; color:var(--accent); font-size:13px; }
-    h1 { font-size:54px; line-height:1.02; margin:18px 0; letter-spacing:-1.5px; }
-    p { color:var(--muted); font-size:18px; line-height:1.65; }
-    .panel { background:rgba(16,29,50,.78); border:1px solid rgba(255,255,255,.12); border-radius:24px; padding:24px; box-shadow:0 20px 70px rgba(0,0,0,.28); }
-    .metric { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:34px 0; }
-    .metric div { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10); border-radius:18px; padding:18px; }
-    .metric strong { display:block; font-size:28px; color:#fff; }
-    a { color:#9cd2ff; text-decoration:none; }
-    img.figure { width:100%; border-radius:16px; border:1px solid rgba(255,255,255,.12); }
-    code { color:#eaf4ff; background:rgba(255,255,255,.08); padding:2px 5px; border-radius:6px; }
-    footer { margin-top:54px; color:var(--muted); font-size:14px; }
-    @media (max-width:800px){ .hero,.metric { grid-template-columns:1fr; } h1 { font-size:40px; } }
+    :root {
+      --ink: #10233d;
+      --muted: #5d6f88;
+      --line: #dbe7f5;
+      --soft: #f5f9ff;
+      --card: rgba(255,255,255,.82);
+      --blue: #2c6db2;
+      --blue2: #7aaee8;
+      --navy: #061426;
+      --good: #0f766e;
+      --warn: #9a5b00;
+      --shadow: 0 24px 70px rgba(19, 48, 89, .16);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 0%, rgba(119,174,232,.22), transparent 32rem),
+        radial-gradient(circle at 86% 4%, rgba(64,119,189,.16), transparent 34rem),
+        linear-gradient(180deg, #f8fbff 0%, #edf5ff 42%, #f8fbff 100%);
+      line-height: 1.65;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .nav {
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: blur(14px);
+      background: rgba(248,251,255,.84);
+      border-bottom: 1px solid rgba(192,211,235,.72);
+    }
+    .nav-inner {
+      max-width: 1180px; margin: 0 auto; padding: 12px 22px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .brand { display:flex; align-items:center; gap:10px; font-weight: 900; letter-spacing:.18em; color: var(--navy); }
+    .brand-dot { width: 12px; height: 12px; border-radius: 999px; background: linear-gradient(135deg, var(--blue), var(--blue2)); box-shadow: 0 0 0 6px rgba(44,109,178,.12); }
+    .nav-links { display:flex; flex-wrap:wrap; gap: 12px; font-size: 14px; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 38px 22px 72px; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
+      gap: 34px;
+      align-items: center;
+      padding: 36px 0 28px;
+    }
+    .eyebrow {
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 11px;
+      border: 1px solid rgba(44,109,178,.18);
+      border-radius: 999px;
+      color: #1e5791;
+      background: rgba(255,255,255,.78);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(48px, 7.5vw, 96px);
+      line-height: .94;
+      letter-spacing: .04em;
+      color: var(--navy);
+    }
+    .subtitle {
+      margin: 0 0 20px;
+      max-width: 700px;
+      font-size: clamp(20px, 2.5vw, 34px);
+      line-height: 1.18;
+      font-weight: 800;
+      color: #223a58;
+    }
+    .lead { max-width: 720px; color: var(--muted); font-size: 17px; }
+    .hero-card {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 16px;
+    }
+    .hero-card img { width: 100%; display: block; border-radius: 18px; }
+    .cta { display:flex; flex-wrap:wrap; gap: 12px; margin-top: 24px; }
+    .button {
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(44,109,178,.2);
+      background: white;
+      font-weight: 800;
+      box-shadow: 0 10px 30px rgba(23, 68, 126, .08);
+    }
+    .button.primary { color: white; background: linear-gradient(135deg, #174a82, #2c6db2); border-color: transparent; }
+    .grid { display:grid; gap: 18px; }
+    .cards-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .cards-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(191,211,235,.78);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 14px 42px rgba(26, 67, 119, .08);
+    }
+    .card h3 { margin: 0 0 8px; font-size: 20px; }
+    .card p { margin: 0; color: var(--muted); }
+    .section { padding: 34px 0; }
+    .section h2 { margin: 0 0 12px; font-size: clamp(28px, 4vw, 44px); line-height: 1.1; color: var(--navy); }
+    .section-intro { max-width: 880px; color: var(--muted); font-size: 17px; margin: 0 0 20px; }
+    .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .metric { padding: 22px; border-radius: 20px; color: white; background: linear-gradient(135deg, #10233d, #275e9c); box-shadow: var(--shadow); }
+    .metric strong { display:block; font-size: 34px; line-height:1; margin-bottom: 8px; }
+    .pill {
+      display:inline-flex; margin: 4px 6px 4px 0; padding: 5px 10px; border-radius: 999px;
+      font-size: 12px; font-weight: 800; color: #174a82; background: #e8f2ff; border:1px solid #cbe1fb;
+    }
+    .flow { counter-reset: step; display:grid; gap: 14px; }
+    .step {
+      position: relative; padding: 18px 18px 18px 64px; background:white; border:1px solid var(--line); border-radius:18px;
+      box-shadow: 0 10px 30px rgba(26,67,119,.06);
+    }
+    .step:before {
+      counter-increment: step; content: counter(step);
+      position:absolute; left:18px; top:18px; width:32px; height:32px; border-radius:50%; display:grid; place-items:center;
+      color:white; font-weight:900; background:linear-gradient(135deg, #174a82, #7aaee8);
+    }
+    .step h3 { margin:0 0 4px; }
+    .step p { margin:0; color:var(--muted); }
+    pre {
+      overflow:auto; padding: 18px; border-radius: 16px; background:#071426; color:#d9e8ff; border:1px solid #1c3558;
+      font-size: 13px;
+    }
+    .figure { background: white; padding: 18px; border-radius: 22px; border:1px solid var(--line); box-shadow: var(--shadow); }
+    .figure img { display:block; max-width:100%; border-radius: 14px; }
+    .note { border-left: 5px solid var(--blue); background: white; padding: 18px 20px; border-radius: 14px; color: var(--muted); }
+    .refs li { margin: 8px 0; }
+    footer { padding: 38px 0 0; color: var(--muted); font-size: 14px; }
+    @media (max-width: 900px) {
+      .hero, .cards-2, .cards-3, .metrics { grid-template-columns: 1fr; }
+      .nav-inner { align-items:flex-start; flex-direction:column; }
+      h1 { font-size: 58px; }
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="cover">
-      <img src="assets/kasumi-hero.png" alt="KASUMI: An Autonomous AI Scientist for Bureaucratic Personnel Policy">
-    </section>
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="brand"><span class="brand-dot"></span> KASUMI</div>
+      <div class="nav-links">
+        <a href="#why">Why</a>
+        <a href="#lineage">Lineage</a>
+        <a href="#implementation">Implementation</a>
+        <a href="#contributions">Contributions</a>
+        <a href="#results">Results</a>
+        <a href="https://github.com/ShogoNoguchi/KASUMI">GitHub</a>
+      </div>
+    </div>
+  </nav>
 
+  <main class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">Bureaucratic personnel policy • multiseed holdout • verified claims</span>
+        <span class="eyebrow">Bureaucratic personnel policy · AI Scientist · LLM-agent ABM</span>
         <h1>KASUMI</h1>
-        <p>A compact public release of an autonomous AI-scientist workflow for bureaucratic personnel policy: staffing and transfer program discovery, agent-based public-service simulation, frozen multiseed holdout, evidence-bound paper writing, and automated review.</p>
-        <p><a href="paper/FINAL_POLICY_PAPER.pdf">Read the generated paper</a> · <a href="artifacts/evidence/development_selection_summary.json">Inspect evidence</a> · <a href="https://github.com/ShogoNoguchi/KASUMI#quickstart-replay-the-public-evidence-bundle">Run the replay</a></p>
+        <p class="subtitle">An autonomous AI scientist for synthetic bureaucratic personnel-policy research.</p>
+        <p class="lead">KASUMI studies staffing, transfer, training, digital-support, and workload interventions in a simulated public-service organization. It combines AI-Scientist-style research automation with Shachi-style LLM-agent ABM, frozen holdout, verified claims, and automated review.</p>
+        <div class="cta">
+          <a class="button primary" href="paper/FINAL_POLICY_PAPER.pdf">Read generated paper</a>
+          <a class="button" href="artifacts/evidence/development_selection_summary.json">Inspect evidence</a>
+          <a class="button" href="https://github.com/ShogoNoguchi/KASUMI#quickstart-replay-the-public-evidence-bundle">Replay on GitHub</a>
+        </div>
       </div>
-      <div class="panel">
-        <p><strong>Autonomous personnel-policy research loop</strong></p>
-        <p>Staffing ideas → transfer design → agent-based bureaucracy simulation → multiseed holdout → verified claims → automated review.</p>
+      <div class="hero-card">
+        <img src="assets/kasumi-hero.png" alt="KASUMI hero image">
       </div>
     </section>
-    <section class="metric">
-      <div><strong>4</strong><span>candidate interventions</span></div>
-      <div><strong>3/3</strong><span>holdout guardrail pass</span></div>
-      <div><strong>153</strong><span>verified claims</span></div>
+
+    <section class="grid metrics" aria-label="headline metrics">
+      <div class="metric"><strong>4</strong>candidate interventions</div>
+      <div class="metric"><strong>3/3</strong>holdout guardrail pass</div>
+      <div class="metric"><strong>153</strong>verified claims</div>
+      <div class="metric"><strong>0</strong>real-world policy claims</div>
     </section>
-    <section class="panel">
-      <h2>Selected pathway</h2>
-      <p>The development stage selected <code>capital_deepening_pathway</code>. In frozen holdout, the selected policy improved the primary welfare endpoint in every seed while satisfying all guardrails.</p>
-      <img class="figure" src="artifacts/figures/primary_welfare_vs_service_loss.png" alt="Primary welfare versus service loss figure">
+
+    <section id="why" class="section">
+      <h2>Why this project exists</h2>
+      <p class="section-intro">KASUMI is motivated by a concrete public-administration problem: personnel systems must balance workload, career development, staffing capacity, fairness, and public-service output. The project does not claim to model any actual ministry. It turns that problem class into a synthetic, auditable AI-science benchmark.</p>
+      <div class="grid cards-2">
+        <div class="card">
+          <h3>Kasumigaseki personnel strain</h3>
+          <p>Public sources discuss young-official retention, long working hours, career uncertainty, digital-process friction, and mismatches between management and non-management perceptions.</p>
+        </div>
+        <div class="card">
+          <h3>From personnel reform to simulation</h3>
+          <p>Government-adjacent proposals discuss opt-in transfers, HR strategy, talent-management systems, learning support, staffing without overtime assumptions, mid-career hiring, and job sharing.</p>
+        </div>
+      </div>
+      <p class="note">KASUMI is a methodological prototype. It asks how autonomous research agents could generate, test, audit, and write up synthetic personnel-policy experiments with clear claim boundaries.</p>
     </section>
-    <footer>Claim boundary: synthetic simulation evidence only. No real-world causal or operational policy claim is made.</footer>
+
+    <section id="lineage" class="section">
+      <h2>Research lineage</h2>
+      <div class="grid cards-3">
+        <div class="card">
+          <h3>The AI Scientist v1</h3>
+          <p>Automates a research loop: idea generation, code writing, experiment execution, figure generation, paper writing, and automated review.</p>
+          <span class="pill">idea generation</span><span class="pill">experiments</span><span class="pill">paper writing</span>
+        </div>
+        <div class="card">
+          <h3>Shachi</h3>
+          <p>A modular framework for LLM-based agent-based modeling, separating agents into components such as LLM, Memory, Tools, and Configuration.</p>
+          <span class="pill">LLM</span><span class="pill">Memory</span><span class="pill">Tools</span><span class="pill">Config</span>
+        </div>
+        <div class="card">
+          <h3>LLM-based ABM</h3>
+          <p>ABM simulates systems from interacting heterogeneous agents. EconAgent is an adjacent example for macroeconomic simulation with LLM-empowered agents.</p>
+          <span class="pill">heterogeneity</span><span class="pill">bottom-up simulation</span><span class="pill">emergence</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="implementation" class="section">
+      <h2>How KASUMI is implemented</h2>
+      <p class="section-intro">KASUMI connects an automated research workflow to a synthetic public-service organization. The public release includes the evidence bundle and deterministic replay layer so readers can inspect the results without LLM provider calls.</p>
+      <div class="flow">
+        <div class="step"><h3>Generate candidate personnel policies</h3><p>Staffing, transfer, training, digital support, responsive management, and procedural-justice pathways.</p></div>
+        <div class="step"><h3>Simulate a stressed public-service organization</h3><p>Agent-based dynamics produce welfare, service-loss, backlog, headcount, strain, and fairness-related metrics.</p></div>
+        <div class="step"><h3>Select under guardrails</h3><p>The primary endpoint must improve while service and fairness guardrails remain satisfied.</p></div>
+        <div class="step"><h3>Freeze and hold out</h3><p>The selected policy is tested on unreused random seeds without reselection.</p></div>
+        <div class="step"><h3>Verify claims</h3><p>Numeric audit and claim verification bind text claims to evidence artifacts.</p></div>
+        <div class="step"><h3>Write and review</h3><p>An AI-Scientist-style writing/review surface turns verified evidence into an anonymous generated paper.</p></div>
+      </div>
+    </section>
+
+    <section id="contributions" class="section">
+      <h2>Contribution surfaces</h2>
+      <div class="grid cards-2">
+        <div class="card">
+          <h3>For AI-Scientist-style workflows</h3>
+          <p>KASUMI provides a social-science-like task template: preregistered endpoints, guardrails, frozen holdout, claim verification, paper contract, and automated review for synthetic policy research.</p>
+          <pre>integrations/ai_scientist_template/public_service_policy_lab/</pre>
+        </div>
+        <div class="card">
+          <h3>For Shachi / LLM-agent ABM</h3>
+          <p>KASUMI provides a compact public-administration environment surface for personnel policy, including staffing, transfer planning, population dynamics, task queues, behavioral gates, and metrics.</p>
+          <pre>src/shachi/env/japan_policy_scientist/</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="section">
+      <h2>Result: capital deepening pathway</h2>
+      <p class="section-intro">The development stage selected <code>capital_deepening_pathway</code>. In frozen holdout, the selected policy improved the primary welfare endpoint in every cell while satisfying all guardrails.</p>
+      <div class="grid cards-3">
+        <div class="card"><h3>Selected run</h3><p><code>run_3</code><br><code>capital_deepening_pathway</code></p></div>
+        <div class="card"><h3>Development delta</h3><p><code>0.005479431872</code> over stressed reference.</p></div>
+        <div class="card"><h3>Mean holdout delta</h3><p><code>0.007192530420</code> across three frozen holdout cells.</p></div>
+      </div>
+      <div class="figure" style="margin-top:18px;">
+        <img src="artifacts/figures/primary_welfare_vs_service_loss.png" alt="Primary welfare versus service loss figure">
+      </div>
+    </section>
+
+    <section id="claim-boundary" class="section">
+      <h2>Claim boundary</h2>
+      <p class="note">KASUMI reports synthetic simulation evidence only. It is not a policy recommendation, not a real-world causal estimate, not a personnel system, and not a digital twin of any actual ministry or organization.</p>
+    </section>
+
+    <section id="references" class="section">
+      <h2>Sources and references</h2>
+      <ul class="refs">
+        <li><a href="https://www.cas.go.jp/jp/gaiyou/jimu/jinjikyoku/pdf/wakate_honbun.pdf">Cabinet Secretariat / National Personnel Authority young-official proposal: カラフルな公務を目指して</a></li>
+        <li><a href="https://www.taro.org/2020/11/%e5%8d%b1%e6%a9%9f%e3%81%ab%e7%9b%b4%e9%9d%a2%e3%81%99%e3%82%8b%e9%9c%9e%e3%83%b6%e9%96%a2.php">Taro Kono: 危機に直面する霞ヶ関</a></li>
+        <li><a href="https://www.businessinsider.jp/article/225315/">Business Insider Japan: 河野大臣「優秀な官僚が霞が関を去るのは問題」</a></li>
+        <li><a href="https://www.nikkei.com/article/DGXZQOUC208FV0Q6A520C2000000/?n_cid=SNSTW005&n_tw=1779599309">Nikkei: 富士通、AIが人事異動案を作成 工数を約98%削減</a></li>
+        <li><a href="https://sakana.ai/ai-scientist/">The AI Scientist project</a></li>
+        <li><a href="https://github.com/sakanaai/shachi">Shachi project</a></li>
+        <li><a href="https://arxiv.org/abs/2310.10436">EconAgent: Large Language Model-Empowered Agents for Simulating Macroeconomic Activities</a></li>
+        <li><a href="SOURCES.md">Source notes with search anchors</a></li>
+      </ul>
+    </section>
+
+    <footer>
+      <p>KASUMI is a research prototype. The generated paper remains anonymous and machine-generated by design; the public site and README explain the artifact without human-editing the paper's claims.</p>
+    </footer>
   </main>
 </body>
 </html>
