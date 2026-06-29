@@ -27,6 +27,15 @@ for asset in fancyhdr.sty iclr2024_conference.bst iclr2024_conference.sty natbib
     exit 1
   }
 done
+
+(
+  cd "$WORKSPACE/AI-Scientist/templates/japan_policy_scientist"
+  python - <<'PY'
+from template_contract import validate_protected_sources
+validate_protected_sources('.')
+print("Protected template source hashes match template_contract.py")
+PY
+)
 python "$ROOT/scripts/audit_public_release.py" "$ROOT"
 python "$ROOT/scripts/check_pr_readiness.py" >/dev/null
 python -m pytest -q "$ROOT/tests"

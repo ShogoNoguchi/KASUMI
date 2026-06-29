@@ -50,8 +50,8 @@ FIXED_CONTRACT: dict[str, Any] = {
 }
 CANDIDATE_POLICY_FILENAME = "candidate_policy.json"
 # Filled after the final current public release executable sources are frozen.
-EXPECTED_EXPERIMENT_SHA256 = "07a21720d7370cfff289a50e23eb58dc070a5491ece18ee70a27a6e1d863c7f9"
-EXPECTED_PLOT_SHA256 = "bcbf57d33b9e77054240874589bdecbfa833d95a3b4c3b6dfca0e1b50d540ba1"
+EXPECTED_EXPERIMENT_SHA256 = "298778a640690172ca13bb12585ed69a37bbf6105ce2e01603bc11231a374018"
+EXPECTED_PLOT_SHA256 = "beacad4d36f20435e2f38cdd07283e4d085d026cd52b8ddba3dec3be2270ff6d"
 
 
 def _template_dir_from(folder: str | Path) -> Path:
