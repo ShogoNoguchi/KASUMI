@@ -21,7 +21,7 @@
   <a href="docs/SOURCES.md"><strong>Source notes</strong></a>
 </p>
 
-**KASUMI** is a synthetic, end-to-end policy-science workflow for studying **bureaucratic personnel policy** in a simulated public-service organization. It combines AI-Scientist-style idea generation, a Shachi-style LLM-agent/ABM environment, frozen multiseed holdout evaluation, evidence-bound writing, numeric claim verification, and automated review.
+**KASUMI** is a synthetic, end-to-end policy-science workflow for studying **bureaucratic personnel policy** in a simulated public-service organization. It combines a packaged mechanism-portfolio research idea, AI-Scientist-style candidate creation, a Shachi-style LLM-agent/ABM environment, frozen multiseed holdout evaluation, evidence-bound writing, numeric claim verification, and automated review.
 
 In one sentence: KASUMI turns a personnel-policy question into a replayable synthetic research artifact—candidate policies, simulation evidence, holdout checks, verified claims, automated reviews, and an anonymous generated paper.
 
@@ -46,6 +46,7 @@ KASUMI asks a narrower question: **can this automated-science stack be redirecte
 3. **Frozen multiseed holdout.** The selected policy is evaluated on new random seeds without reselection.
 4. **Evidence-bound writing.** The generated paper is backed by machine-readable claim verification, numeric audit, and automated review artifacts.
 5. **Deterministic public replay.** The public evidence bundle can be replayed without provider calls.
+6. **Provider-backed E2E reproduction.** The live pipeline can also be rerun from pinned AI Scientist and Shachi upstream revisions: Shachi baseline, packaged mechanism portfolio, AI Scientist candidate development, Shachi intervention runs, selection freeze, frozen holdout, paper generation, and automated review.
 
 ## Background: the policy problem
 
@@ -77,8 +78,8 @@ EconAgent is a useful analogue because it uses LLM-empowered heterogeneous agent
 ## How KASUMI is implemented
 
 ```text
-Idea generation
-  -> candidate staffing / transfer / training / digital-support programs
+Packaged mechanism portfolio
+  -> AI-Scientist candidate staffing / transfer / training / digital-support programs
 Agent-based public-service simulation
   -> stressed reference organization and intervention arms
 Development selection
@@ -91,7 +92,33 @@ Generated paper
   -> anonymous AI-generated manuscript, not human-edited policy advice
 ```
 
-The public release packages the final evidence and replay layer rather than the paid full-run provider calls. The goal is inspectability: a reader can inspect the simulation-facing code, the AI-Scientist-style task template, the Shachi-style extension surface, the evidence JSON files, the generated paper, and the deterministic replay script.
+The public release has two reproduction paths. The lightweight replay path rebuilds reports and figures from the checked-in evidence bundle without provider calls. The full E2E path in `scripts/e2e/` bootstraps pinned public upstream AI Scientist and Shachi revisions, applies the KASUMI task overlay, and reruns the provider-backed research workflow. The goal is inspectability and re-executability: a reader can inspect the simulation-facing code, the AI-Scientist-style task template, the Shachi-style extension surface, the evidence JSON files, the generated paper, the deterministic replay script, and the live E2E runner.
+
+## Full E2E reproduction with provider calls
+
+KASUMI is not only an evidence replay repository.  The public repo also includes a live E2E harness under [`scripts/e2e/`](scripts/e2e/) and a full runbook in [`docs/E2E_REPRODUCTION.md`](docs/E2E_REPRODUCTION.md).
+
+The default live pipeline follows the actual experiment shape: Shachi runs the stressed-reference baseline with Gemini 2.5 Flash-Lite, the packaged mechanism-portfolio idea is prepared without live open-ended idea generation, AI Scientist development uses Gemini 2.5 Pro to create and run `run_1` through `run_4`, selection is frozen, the selected policy is evaluated on the frozen holdout seeds, the paper is generated, and automated domain review is run.
+
+Minimal command sequence:
+
+```bash
+WORKSPACE="$HOME/kasumi-e2e-workspace"
+scripts/e2e/bootstrap_workspace.sh "$WORKSPACE"
+scripts/e2e/run_preflight_no_api.sh "$WORKSPACE"
+cp configs/operator_budget_plan.template.json "$WORKSPACE/operator_budget_plan.json"
+# Edit the copied budget checklist locally. Do not commit it.
+export GEMINI_API_KEY="..."
+export KASUMI_E2E_ALLOW_PROVIDER_CALLS=1
+scripts/e2e/run_baseline.sh "$WORKSPACE"
+scripts/e2e/prepare_packaged_idea.sh "$WORKSPACE"
+scripts/e2e/run_ai_scientist_development.sh "$WORKSPACE"
+scripts/e2e/run_selection_and_holdout.sh "$WORKSPACE"
+scripts/e2e/run_final_paper.sh "$WORKSPACE"
+scripts/e2e/run_domain_review.sh "$WORKSPACE"
+```
+
+Provider-backed reruns are not guaranteed to be bit-identical to the checked-in artifact snapshot, because hosted LLM behavior can change. The checked-in `paper/` and `artifacts/` directories are the final public evidence snapshot; the E2E scripts reproduce the execution contract and methodology.
 
 ## Headline result
 
@@ -197,7 +224,7 @@ python scripts/audit_public_release.py .
 pytest -q
 ```
 
-The replay command rebuilds a small report and summary figures from the public evidence bundle. `regenerate_public_figures.py` refreshes the public result figures under both `artifacts/figures/` and `docs/artifacts/figures/`. Neither command calls an LLM provider.
+The replay command rebuilds a small report and summary figures from the public evidence bundle. `regenerate_public_figures.py` refreshes the public result figures under both `artifacts/figures/` and `docs/artifacts/figures/`. Neither replay command calls an LLM provider. For the full provider-backed rerun, use [`docs/E2E_REPRODUCTION.md`](docs/E2E_REPRODUCTION.md).
 
 ## Main paper and evidence
 

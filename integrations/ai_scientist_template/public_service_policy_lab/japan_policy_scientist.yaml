@@ -1,7 +1,7 @@
 package:
   name: japan_policy_scientist
   version: 1.4.5
-  profile: adaptive_api_local_fast_track_no_holdout
+  profile: adaptive_api_local_multiseed_holdout
 experiment:
   fixed_seed: 20260619
   scenario: reference_stressed
@@ -18,10 +18,14 @@ experiment:
   - run_2
   - run_3
   - run_4
-  holdout_scenarios: []
-  holdout_seeds: []
-  fast_track_no_holdout: true
-  scale_profile: adaptive_120slot_48month_no_holdout
+  holdout_scenarios:
+  - reference_stressed
+  holdout_seeds:
+  - 20260631
+  - 20260637
+  - 20260641
+  fast_track_no_holdout: false
+  scale_profile: adaptive_120slot_48month_multiseed_holdout
 management:
   mode: deterministic_priority
   optional_llm_ablation: true
@@ -90,21 +94,21 @@ selection:
   - cumulative_service_harm_points_post
   - policy_implementation_cost_points
 execution_strategy:
-  description: current public release keeps the 48-month horizon, 12-month warmup, and exact run_0..run_4
-    comparison, disables holdout/submission-pilot, and uses representative cohorts
+  description: KASUMI public E2E keeps the 48-month horizon, 12-month warmup, exact run_0..run_4
+    comparison, and frozen three-seed holdout, using representative cohorts
     with adaptive live Gemini, Gemini Batch, or local OpenAI-compatible backends.
     The default fast-track profile targets 120 slots and 12 representative cohorts/month.
   baseline_target_employee_month_calls: 5760
   five_arm_target_employee_month_calls_with_warmup_reuse_estimate: 23040
   reference_comparison: EconAgent uses 100 agents and period barriers, while Shachi
-    bureaucracy uses richer structured actions. current public release keeps 48 months and run_0..run_4
-    but reduces slots and replaces one paid live call per agent-step with representative
+    bureaucracy uses richer structured actions. KASUMI public E2E keeps 48 months, run_0..run_4, and frozen holdout
+    while reducing slots and replaces one paid live call per agent-step with representative
     cohorts plus batch/local backends.
 urgent_scale_profile:
-  name: adaptive_120_agents_48_months_no_holdout
+  name: adaptive_120_agents_48_months_multiseed_holdout
   rationale: Preserve 48 months and the 36-month policy window while reducing direct
     employee-month volume; representative cohort max groups defaults to 12/month for
     weekend execution.
   reference_comparison: 'Closer to existing LLM-ABM call design: period barriers plus
     representative/cohort decisions rather than one live API call per employee-step.'
-  holdout_disabled: true
+  holdout_disabled: false

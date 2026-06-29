@@ -8,17 +8,21 @@ from pathlib import Path
 # Construct private-context patterns from fragments so this public file does not
 # itself contain those phrases verbatim.
 PRIVATE_PATTERNS = [
-    "Sa" + "kana",
+    # Private challenge/evaluation/provenance wording must not appear in the
+    # public repository. Public upstream project names such as Sakana AI,
+    # The AI Scientist, and Shachi are allowed when used as citations or
+    # third-party notices.
     "Technical" + " Problem" + " Set",
     "Part" + " 5",
     "Effort" + "300",
+    r"SakanaV\d",
     r"V1\.4",
     "v" + "146",
     "native" + "_holdout",
     "Recruit" + "er",
+    "N" + "DA",
     "/mnt" + "/ssd",
-    "provider" + " console",
-    "observed" + "_provider" + "_cost",
+    "private" + " evaluation",
 ]
 SECRET_PATTERNS = [
     r"AIza[0-9A-Za-z_-]{20,}",

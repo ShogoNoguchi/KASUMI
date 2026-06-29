@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "approved": false,
+  "operator": "EDIT_ME",
+  "approved_at_utc": "EDIT_ME",
+  "campaign_id": "kasumi-public-e2e",
+  "dedicated_provider_project_or_key": false,
+  "provider_budget_alert_is_not_a_hard_cap": false,
+  "external_llm_calls_outside_local_replay_understood": false,
+  "manual_provider_usage_check_between_provider_stages": false,
+  "campaign_authorized_usd": 300.0,
+  "stage_authorized_usd": {
+    "baseline": 60.0,
+    "ai_scientist_development": 120.0,
+    "holdout": 90.0,
+    "final_paper": 20.0,
+    "domain_review": 10.0
+  },
+  "notes": "This public template is a human budget checklist. It is not an API credential file. Do not commit filled-in copies."
+}

@@ -1,0 +1,1167 @@
+diff -ruN orig/ai_scientist/generate_ideas.py patched/ai_scientist/generate_ideas.py
+--- orig/ai_scientist/generate_ideas.py	2025-12-19 07:46:21.000000000 +0000
++++ patched/ai_scientist/generate_ideas.py	2026-06-26 01:42:21.070320984 +0000
+@@ -8,6 +8,13 @@
+ import requests
+ 
+ from ai_scientist.llm import get_response_from_llm, extract_json_between_markers, create_client, AVAILABLE_LLMS
++from ai_scientist.policy_context import (
++    enrich_task_description,
++    render_template_idea_prompt,
++    render_template_idea_reflection_prompt,
++    render_template_novelty_context,
++    validate_template_idea,
++)
+ 
+ S2_API_KEY = os.getenv("S2_API_KEY")
+ 
+@@ -86,6 +93,7 @@
+         try:
+             with open(osp.join(base_dir, "ideas.json"), "r") as f:
+                 ideas = json.load(f)
++            ideas = [validate_template_idea(base_dir, idea) for idea in ideas]
+             print("Loaded existing ideas:")
+             for idea in ideas:
+                 print(idea)
+@@ -99,13 +107,15 @@
+     with open(osp.join(base_dir, "seed_ideas.json"), "r") as f:
+         seed_ideas = json.load(f)
+     for seed_idea in seed_ideas:
+-        idea_str_archive.append(json.dumps(seed_idea))
++        validated_seed = validate_template_idea(base_dir, seed_idea)
++        idea_str_archive.append(json.dumps(validated_seed))
+ 
+     with open(osp.join(base_dir, "experiment.py"), "r") as f:
+         code = f.read()
+ 
+     with open(osp.join(base_dir, "prompt.json"), "r") as f:
+         prompt = json.load(f)
++    prompt["task_description"] = enrich_task_description(base_dir, prompt["task_description"])
+ 
+     idea_system_prompt = prompt["system"]
+ 
+@@ -117,13 +127,19 @@
+ 
+             msg_history = []
+             print(f"Iteration 1/{num_reflections}")
++            first_prompt = render_template_idea_prompt(
++                base_dir,
++                task_description=prompt["task_description"],
++                previous_ideas=prev_ideas_string,
++                num_reflections=num_reflections,
++            ) or idea_first_prompt.format(
++                task_description=prompt["task_description"],
++                code=code,
++                prev_ideas_string=prev_ideas_string,
++                num_reflections=num_reflections,
++            )
+             text, msg_history = get_response_from_llm(
+-                idea_first_prompt.format(
+-                    task_description=prompt["task_description"],
+-                    code=code,
+-                    prev_ideas_string=prev_ideas_string,
+-                    num_reflections=num_reflections,
+-                ),
++                first_prompt,
+                 client=client,
+                 model=model,
+                 system_message=idea_system_prompt,
+@@ -132,16 +148,20 @@
+             ## PARSE OUTPUT
+             json_output = extract_json_between_markers(text)
+             assert json_output is not None, "Failed to extract JSON from LLM output"
++            json_output = validate_template_idea(base_dir, json_output)
+             print(json_output)
+ 
+             # Iteratively improve task.
+             if num_reflections > 1:
+                 for j in range(num_reflections - 1):
+                     print(f"Iteration {j + 2}/{num_reflections}")
++                    reflection_prompt = render_template_idea_reflection_prompt(
++                        base_dir, current_round=j + 2, num_reflections=num_reflections
++                    ) or idea_reflection_prompt.format(
++                        current_round=j + 2, num_reflections=num_reflections
++                    )
+                     text, msg_history = get_response_from_llm(
+-                        idea_reflection_prompt.format(
+-                            current_round=j + 2, num_reflections=num_reflections
+-                        ),
++                        reflection_prompt,
+                         client=client,
+                         model=model,
+                         system_message=idea_system_prompt,
+@@ -152,6 +172,7 @@
+                     assert (
+                             json_output is not None
+                     ), "Failed to extract JSON from LLM output"
++                    json_output = validate_template_idea(base_dir, json_output)
+                     print(json_output)
+ 
+                     if "I am done" in text:
+@@ -194,12 +215,13 @@
+         with open(osp.join(base_dir, "seed_ideas.json"), "r") as f:
+             seed_ideas = json.load(f)
+         for seed_idea in seed_ideas[:1]:
+-            idea_archive.append(seed_idea)
++            idea_archive.append(validate_template_idea(base_dir, seed_idea))
+     else:
+         with open(osp.join(base_dir, "experiment.py"), "r") as f:
+             code = f.read()
+         with open(osp.join(base_dir, "prompt.json"), "r") as f:
+             prompt = json.load(f)
++        prompt["task_description"] = enrich_task_description(base_dir, prompt["task_description"])
+         idea_system_prompt = prompt["system"]
+ 
+         for _ in range(max_attempts):
+@@ -211,7 +233,12 @@
+ 
+                 msg_history = []
+                 print(f"Iteration 1/{num_reflections}")
+-                text, msg_history = get_response_from_llm(
++                first_prompt = render_template_idea_prompt(
++                    base_dir,
++                    task_description=prompt["task_description"],
++                    previous_ideas=prev_ideas_string,
++                    num_reflections=num_reflections,
++                ) or (
+                     idea_first_prompt.format(
+                         task_description=prompt["task_description"],
+                         code=code,
+@@ -222,7 +249,10 @@
+ Completed ideas have an additional "Score" field which indicates the assessment by an expert ML reviewer.
+ This is on a standard 1-10 ML conference scale.
+ Scores of 0 indicate the idea failed either during experimentation, writeup or reviewing.
+-""",
++"""
++                )
++                text, msg_history = get_response_from_llm(
++                    first_prompt,
+                     client=client,
+                     model=model,
+                     system_message=idea_system_prompt,
+@@ -231,16 +261,20 @@
+                 ## PARSE OUTPUT
+                 json_output = extract_json_between_markers(text)
+                 assert json_output is not None, "Failed to extract JSON from LLM output"
++                json_output = validate_template_idea(base_dir, json_output)
+                 print(json_output)
+ 
+                 # Iteratively improve task.
+                 if num_reflections > 1:
+                     for j in range(num_reflections - 1):
+                         print(f"Iteration {j + 2}/{num_reflections}")
++                        reflection_prompt = render_template_idea_reflection_prompt(
++                            base_dir, current_round=j + 2, num_reflections=num_reflections
++                        ) or idea_reflection_prompt.format(
++                            current_round=j + 2, num_reflections=num_reflections
++                        )
+                         text, msg_history = get_response_from_llm(
+-                            idea_reflection_prompt.format(
+-                                current_round=j + 2, num_reflections=num_reflections
+-                            ),
++                            reflection_prompt,
+                             client=client,
+                             model=model,
+                             system_message=idea_system_prompt,
+@@ -251,6 +285,7 @@
+                         assert (
+                                 json_output is not None
+                         ), "Failed to extract JSON from LLM output"
++                        json_output = validate_template_idea(base_dir, json_output)
+                         print(json_output)
+ 
+                         if "I am done" in text:
+@@ -280,11 +315,16 @@
+ 
+ 
+ @backoff.on_exception(
+-    backoff.expo, requests.exceptions.HTTPError, on_backoff=on_backoff
++    backoff.expo,
++    requests.exceptions.RequestException,
++    max_tries=4,
++    max_time=60,
++    on_backoff=on_backoff,
+ )
+-def search_for_papers(query, result_limit=10, engine="semanticscholar") -> Union[None, List[Dict]]:
++def search_for_papers(query, result_limit=10, engine="semanticscholar") -> List[Dict]:
++    """Search literature with bounded network waits and a uniform result schema."""
+     if not query:
+-        return None
++        return []
+     if engine == "semanticscholar":
+         rsp = requests.get(
+             "https://api.semanticscholar.org/graph/v1/paper/search",
+@@ -294,62 +334,70 @@
+                 "limit": result_limit,
+                 "fields": "title,authors,venue,year,abstract,citationStyles,citationCount",
+             },
++            timeout=(10, 30),
+         )
+         print(f"Response Status Code: {rsp.status_code}")
+-        print(
+-            f"Response Content: {rsp.text[:500]}"
+-        )  # Print the first 500 characters of the response content
++        print(f"Response Content: {rsp.text[:500]}")
+         rsp.raise_for_status()
+         results = rsp.json()
+-        total = results["total"]
+         time.sleep(1.0)
+-        if not total:
+-            return None
+-
+-        papers = results["data"]
+-        return papers
+-    elif engine == "openalex":
++        if not results.get("total"):
++            return []
++        return list(results.get("data") or [])
++    if engine == "openalex":
++        import re
+         import pyalex
+         from pyalex import Work, Works
+-        mail = os.environ.get("OPENALEX_MAIL_ADDRESS", None)
+-        if mail is None:
+-            print("[WARNING] Please set OPENALEX_MAIL_ADDRESS for better access to OpenAlex API!")
+-        else:
++
++        mail = os.environ.get("OPENALEX_MAIL_ADDRESS")
++        if mail:
+             pyalex.config.email = mail
++        else:
++            print("[WARNING] Set OPENALEX_MAIL_ADDRESS for polite OpenAlex access.")
++
++        def bibtex_escape(value: str) -> str:
++            return value.replace("{", "").replace("}", "").replace("%", "\\%")
+ 
+-        def extract_info_from_work(work: Work, max_abstract_length: int = 1000) -> dict[str, str]:
+-            # "Unknown" is returned when venue is unknown...
++        def extract_info_from_work(work: Work, max_abstract_length: int = 1000) -> dict:
++            locations = work.get("locations") or []
+             venue = "Unknown"
+-            for i, location in enumerate(work["locations"]):
+-                if location["source"] is not None:
+-                    venue = location["source"]["display_name"]
+-                    if venue != "":
+-                        break
+-            title = work["title"]
+-            abstract = work["abstract"]
+-            if abstract is None:
+-                abstract = ""
+-            if len(abstract) > max_abstract_length:
+-                # To avoid context length exceed error.
+-                print(f"[WARNING] {title=}: {len(abstract)=} is too long! Use first {max_abstract_length} chars.")
+-                abstract = abstract[:max_abstract_length]
+-            authors_list = [author["author"]["display_name"] for author in work["authorships"]]
+-            authors = " and ".join(authors_list) if len(authors_list) < 20 else f"{authors_list[0]} et al."
+-            paper = dict(
+-                title=title,
+-                authors=authors,
+-                venue=venue,
+-                year=work["publication_year"],
+-                abstract=abstract,
+-                citationCount=work["cited_by_count"],
++            for location in locations:
++                source = location.get("source") if isinstance(location, dict) else None
++                if source and source.get("display_name"):
++                    venue = source["display_name"]
++                    break
++            title = str(work.get("title") or "Untitled")
++            abstract = str(work.get("abstract") or "")[:max_abstract_length]
++            author_names = [
++                str(row.get("author", {}).get("display_name"))
++                for row in (work.get("authorships") or [])
++                if row.get("author", {}).get("display_name")
++            ]
++            authors = " and ".join(author_names) if author_names else "Unknown"
++            year = work.get("publication_year") or "n.d."
++            first = re.sub(r"[^A-Za-z0-9]+", "", author_names[0].split()[-1]) if author_names else "openalex"
++            key = f"{first}{year}_{abs(hash(work.get('id') or title)) % 100000}"
++            bibtex = (
++                f"@article{{{key},\n"
++                f"  title={{{bibtex_escape(title)}}},\n"
++                f"  author={{{bibtex_escape(authors)}}},\n"
++                f"  journal={{{bibtex_escape(venue)}}},\n"
++                f"  year={{{year}}}\n"
++                "}"
+             )
+-            return paper
++            return {
++                "title": title,
++                "authors": authors,
++                "venue": venue,
++                "year": year,
++                "abstract": abstract,
++                "citationCount": work.get("cited_by_count", 0),
++                "citationStyles": {"bibtex": bibtex},
++            }
+ 
+         works: List[Dict] = Works().search(query).get(per_page=result_limit)
+-        papers: List[Dict[str, str]] = [extract_info_from_work(work) for work in works]
+-        return papers
+-    else:
+-        raise NotImplementedError(f"{engine=} not supported!")
++        return [extract_info_from_work(work) for work in works]
++    raise NotImplementedError(f"{engine=} not supported!")
+ 
+ 
+ 
+@@ -414,9 +462,14 @@
+         code = f.read()
+     with open(osp.join(base_dir, "prompt.json"), "r") as f:
+         prompt = json.load(f)
+-        task_description = prompt["task_description"]
++        task_description = enrich_task_description(base_dir, prompt["task_description"])
++        task_description = render_template_novelty_context(
++            base_dir, task_description=task_description
++        ) or task_description
+ 
+     for idx, idea in enumerate(ideas):
++        idea = validate_template_idea(base_dir, idea)
++        ideas[idx] = idea
+         if "novel" in idea:
+             print(f"Skipping idea {idx}, already checked.")
+             continue
+@@ -460,8 +513,9 @@
+                 ## SEARCH FOR PAPERS
+                 query = json_output["Query"]
+                 papers = search_for_papers(query, result_limit=10, engine=engine)
+-                if papers is None:
++                if not papers:
+                     papers_str = "No papers found."
++                    continue
+ 
+                 paper_strings = []
+                 for i, paper in enumerate(papers):
+diff -ruN orig/ai_scientist/llm.py patched/ai_scientist/llm.py
+--- orig/ai_scientist/llm.py	2025-12-19 07:46:21.000000000 +0000
++++ patched/ai_scientist/llm.py	2026-06-26 01:42:21.071257092 +0000
+@@ -57,6 +57,9 @@
+     "gemini-2.0-flash",
+     "gemini-2.0-flash-lite",
+     "gemini-2.0-flash-thinking-exp-01-21",
++    "gemini-2.5-flash",
++    "gemini-2.5-flash-lite",
++    "gemini-2.5-pro",
+     "gemini-2.5-pro-preview-03-25",
+     "gemini-2.5-pro-exp-03-25",
+ ]
+diff -ruN orig/ai_scientist/perform_experiments.py patched/ai_scientist/perform_experiments.py
+--- orig/ai_scientist/perform_experiments.py	2025-12-19 07:46:21.000000000 +0000
++++ patched/ai_scientist/perform_experiments.py	2026-06-26 01:42:21.071853560 +0000
+@@ -1,19 +1,28 @@
+ import json
++import os
+ import os.path as osp
+ import shutil
+ import subprocess
+ import sys
+ from subprocess import TimeoutExpired
+ 
++from ai_scientist.policy_context import (
++    load_problem_context,
++    scientist_visible_results,
++    validate_template_run,
++)
++
+ MAX_ITERS = 4
+-MAX_RUNS = 5
++MAX_RUNS = int(os.environ.get("AI_SCIENTIST_MAX_RUNS", "4"))
+ MAX_STDERR_OUTPUT = 1500
++OPERATOR_INTERVENTION_RETURN_CODE = 86
+ 
+ coder_prompt = """Your goal is to implement the following idea: {title}.
+ The proposed experiment is as follows: {idea}.
+-You are given a total of up to {max_runs} runs to complete the necessary experiments. You do not need to use all {max_runs}.
++You are given exactly {max_runs} intervention runs for this matched PoC contract. Complete all {max_runs} distinct runs.
++Use the fixed full-fidelity contract for every run. Never shorten, downsample, substitute, or simplify a run; maximize scientific information and mechanism discrimination.
+ 
+-First, plan the list of experiments you would like to run. For example, if you are sweeping over a specific hyperparameter, plan each value you would like to test for each run.
++First, plan four distinct, falsifiable policy-mechanism tests. For every run, edit only `candidate_policy.json`, which must remain strict JSON. Never edit or request edits to any Python source.
+ 
+ Note that we already provide the vanilla baseline results, so you do not need to re-run it.
+ 
+@@ -23,17 +32,71 @@
+ 
+ After you complete each change, we will run the command `python experiment.py --out_dir=run_i' where i is the run number and evaluate the results.
+ YOUR PROPOSED CHANGE MUST USE THIS COMMAND FORMAT, DO NOT ADD ADDITIONAL COMMAND LINE ARGS.
+-You can then implement the next thing on your list."""
++Only `candidate_policy.json` is writable. You can then implement the next policy mapping on your list."""
++
++
++def _intervention_for_run(idea, run_num):
++    interventions = idea.get("Interventions") if isinstance(idea, dict) else None
++    if not isinstance(interventions, list):
++        return None
++    for intervention in interventions:
++        if int(intervention.get("Run", -1)) == run_num:
++            return intervention
++    raise ValueError(f"Idea lacks exact intervention mapping for run_{run_num}")
++
++
++def _exact_policy_prompt(idea, run_num, baseline_results, problem_context, error_message=None):
++    intervention = _intervention_for_run(idea, run_num)
++    if intervention is None:
++        return None
++    policy_json = json.dumps(intervention["Policy"], ensure_ascii=False, indent=2)
++    error_block = "" if not error_message else f"\nThe previous attempt failed with this diagnostic; correct only the JSON transcription error and preserve the exact mapping:\n{error_message}\n"
++    return f"""Implement the prevalidated policy mapping for run_{run_num}. Edit only candidate_policy.json. Replace the entire file with exactly this strict JSON object; do not alter any value, add any field, or edit Python:
++```json
++{policy_json}
++```
++Mechanism: {intervention['Mechanism']}
++Expected direction: {intervention['ExpectedDirection']}
++Adverse-effect prediction: {intervention['AdverseEffectPrediction']}
++The executable design is fixed and full-fidelity. Do not change run count, population, months, seed, scenario, metrics, plotting code, or any source file.
++{error_block}
++Baseline summary for orientation only: {baseline_results}
++{problem_context}
++After writing the exact JSON, stop. Do not answer ALL_COMPLETED until run_1 through run_4 have all executed."""
++
++
++def _write_exact_policy(folder_name, idea, run_num):
++    """Materialize the validated data-only intervention without another LLM call."""
++    intervention = _intervention_for_run(idea, run_num)
++    if intervention is None:
++        raise ValueError(f"Protected template idea lacks run_{run_num}")
++    path = osp.join(folder_name, "candidate_policy.json")
++    tmp = f"{path}.tmp.{os.getpid()}"
++    with open(tmp, "w", encoding="utf-8") as handle:
++        json.dump(intervention["Policy"], handle, ensure_ascii=False, indent=2, sort_keys=True)
++        handle.write("\n")
++        handle.flush()
++        os.fsync(handle.fileno())
++    os.replace(tmp, path)
++    with open(osp.join(folder_name, "notes.txt"), "a", encoding="utf-8") as notes:
++        notes.write(f"\n\n## Predeclared Run {run_num} intervention\n")
++        notes.write(json.dumps(intervention, ensure_ascii=False, indent=2))
++        notes.write("\n")
+ 
+ 
+ # RUN EXPERIMENT
+-def run_experiment(folder_name, run_num, timeout=7200):
++def run_experiment(folder_name, run_num, timeout=None):
++    timeout = int(timeout or os.environ.get("AI_SCIENTIST_RUN_TIMEOUT_SECONDS", "172800"))
+     cwd = osp.abspath(folder_name)
+-    # COPY CODE SO WE CAN SEE IT.
++    # Preserve the immutable runner and the exact scientist-edited data mapping.
+     shutil.copy(
+         osp.join(folder_name, "experiment.py"),
+         osp.join(folder_name, f"run_{run_num}.py"),
+     )
++    shutil.copy(
++        osp.join(folder_name, "candidate_policy.json"),
++        osp.join(folder_name, f"run_{run_num}_candidate_policy.json"),
++    )
+ 
+     # LAUNCH COMMAND
+     command = [
+@@ -51,8 +114,36 @@
+ 
+         if result.returncode != 0:
+             print(f"Run {run_num} failed with return code {result.returncode}")
+-            if osp.exists(osp.join(cwd, f"run_{run_num}")):
+-                shutil.rmtree(osp.join(cwd, f"run_{run_num}"))
++            run_dir = osp.join(cwd, f"run_{run_num}")
++            os.makedirs(run_dir, exist_ok=True)
++            wrapper_failure = {
++                "returncode": result.returncode,
++                "stderr": result.stderr,
++                "artifacts_preserved": True,
++                "resume_rule": (
++                    "Retrying the unchanged policy resumes its exact cache contract; "
++                    "changing the policy archives this failed directory under failed_attempts/."
++                ),
++            }
++            with open(osp.join(run_dir, "ai_scientist_wrapper_failure.json"), "w", encoding="utf-8") as handle:
++                json.dump(wrapper_failure, handle, ensure_ascii=False, indent=2)
++            with open(osp.join(run_dir, "failed.marker"), "a", encoding="utf-8") as handle:
++                handle.write(f"AI Scientist wrapper return code {result.returncode}\n")
++            failure_path = osp.join(run_dir, "failure.json")
++            if osp.exists(failure_path):
++                with open(failure_path, "r", encoding="utf-8") as handle:
++                    failure_payload = json.load(handle)
++                if failure_payload.get("exception_type") == "BudgetExceededError":
++                    print(
++                        "Operator-only circuit breaker stopped the run. The exact policy and "
++                        "partial cache were preserved; AI Scientist is not permitted to redesign "
++                        "the experiment in response."
++                    )
++                    return (
++                        OPERATOR_INTERVENTION_RETURN_CODE,
++                        "Operator intervention is required. Preserve the exact policy and stop; "
++                        "do not modify candidate_policy.json or reduce experimental fidelity.",
++                    )
+             print(f"Run failed with the following error {result.stderr}")
+             stderr_output = result.stderr
+             if len(stderr_output) > MAX_STDERR_OUTPUT:
+@@ -61,7 +152,15 @@
+         else:
+             with open(osp.join(cwd, f"run_{run_num}", "final_info.json"), "r") as f:
+                 results = json.load(f)
++            validate_template_run(folder_name, run_num)
+             results = {k: v["means"] for k, v in results.items()}
++            results = scientist_visible_results(folder_name, results)
++            # Preserve every successful run, including the final one that the
++            # conversational loop would otherwise not summarize before exit.
++            with open(osp.join(cwd, "notes.txt"), "a", encoding="utf-8") as notes:
++                notes.write(f"\n\n## Machine-recorded Run {run_num} results\n")
++                notes.write(json.dumps(results, indent=2, ensure_ascii=False))
++                notes.write("\n")
+ 
+             next_prompt = f"""Run {run_num} completed. Here are the results:
+ {results}
+@@ -78,14 +177,28 @@
+         return result.returncode, next_prompt
+     except TimeoutExpired:
+         print(f"Run {run_num} timed out after {timeout} seconds")
+-        if osp.exists(osp.join(cwd, f"run_{run_num}")):
+-            shutil.rmtree(osp.join(cwd, f"run_{run_num}"))
+-        next_prompt = f"Run timed out after {timeout} seconds"
++        run_dir = osp.join(cwd, f"run_{run_num}")
++        os.makedirs(run_dir, exist_ok=True)
++        with open(osp.join(run_dir, "ai_scientist_wrapper_failure.json"), "w", encoding="utf-8") as handle:
++            json.dump(
++                {
++                    "timeout_seconds": timeout,
++                    "artifacts_preserved": True,
++                    "resume_rule": "Retry the same policy to resume the preserved response cache.",
++                },
++                handle,
++                ensure_ascii=False,
++                indent=2,
++            )
++        with open(osp.join(run_dir, "failed.marker"), "a", encoding="utf-8") as handle:
++            handle.write(f"AI Scientist wrapper timeout after {timeout} seconds\n")
++        next_prompt = f"Run timed out after {timeout} seconds; all partial artifacts were preserved for exact-contract resume."
+         return 1, next_prompt
+ 
+ 
+ # RUN PLOTTING
+-def run_plotting(folder_name, timeout=600):
++def run_plotting(folder_name, timeout=None):
++    timeout = int(timeout or os.environ.get("AI_SCIENTIST_PLOT_TIMEOUT_SECONDS", "1800"))
+     cwd = osp.abspath(folder_name)
+     # LAUNCH COMMAND
+     command = [
+@@ -114,7 +227,49 @@
+ 
+ # PERFORM EXPERIMENTS
+ def perform_experiments(idea, folder_name, coder, baseline_results) -> bool:
+-    ## RUN EXPERIMENT
++    """Execute the research program. Protected templates use exact data mappings only."""
++    requires_exact_runs = osp.exists(osp.join(folder_name, "template_contract.py"))
++    problem_context = load_problem_context(folder_name)
++
++    if requires_exact_runs:
++        # The scientific LLM has already produced and schema-validated four exact
++        # policy mappings. Re-asking a coding agent to transcribe them adds cost
++        # and creates a new failure surface, so the orchestrator materializes them
++        # deterministically and executes the immutable runner.
++        for run in range(1, MAX_RUNS + 1):
++            _write_exact_policy(folder_name, idea, run)
++            last_diagnostic = ""
++            for attempt in range(1, MAX_ITERS + 1):
++                return_code, last_diagnostic = run_experiment(folder_name, run)
++                if return_code == 0:
++                    break
++                if return_code == OPERATOR_INTERVENTION_RETURN_CODE:
++                    print(
++                        "Execution paused by an operator-only circuit breaker. Resume the "
++                        "unchanged run after human authorization; no policy redesign is allowed."
++                    )
++                    return False
++                print(
++                    f"Exact run_{run} attempt {attempt}/{MAX_ITERS} failed; "
++                    "retrying the unchanged mapping and preserved cache."
++                )
++            else:
++                print(f"run_{run} failed under the exact mapping: {last_diagnostic}")
++                return False
++
++        return_code, plotting_message = run_plotting(folder_name)
++        if return_code != 0:
++            print(plotting_message)
++            return False
++        with open(osp.join(folder_name, "notes.txt"), "a", encoding="utf-8") as notes:
++            notes.write(
++                "\n\n## Figure generation\n"
++                "The immutable plotting runner generated the figures after all four "
++                "predeclared interventions completed. Final interpretation is deferred "
++                "until selection and frozen holdout.\n"
++            )
++        return True
++
+     current_iter = 0
+     run = 1
+     next_prompt = coder_prompt.format(
+@@ -122,45 +277,36 @@
+         idea=idea["Experiment"],
+         max_runs=MAX_RUNS,
+         baseline_results=baseline_results,
+-    )
++    ) + problem_context
++
+     while run < MAX_RUNS + 1:
+         if current_iter >= MAX_ITERS:
+             print("Max iterations reached")
+             break
+         coder_out = coder.run(next_prompt)
+         print(coder_out)
+-        if "ALL_COMPLETED" in coder_out:
++        if "ALL_COMPLETED" in coder_out and run <= MAX_RUNS:
+             break
+-        return_code, next_prompt = run_experiment(folder_name, run)
++        return_code, diagnostic = run_experiment(folder_name, run)
++        if return_code == OPERATOR_INTERVENTION_RETURN_CODE:
++            return False
+         if return_code == 0:
+             run += 1
+             current_iter = 0
++            next_prompt = diagnostic
++            continue
+         current_iter += 1
+-    if current_iter >= MAX_ITERS:
++        next_prompt = diagnostic
++
++    if current_iter >= MAX_ITERS or run != MAX_RUNS + 1:
+         print("Not all experiments completed.")
+         return False
+-
+-    current_iter = 0
+-    next_prompt = """
+-Great job! Please modify `plot.py` to generate the most relevant plots for the final writeup. 
+-
+-In particular, be sure to fill in the "labels" dictionary with the correct names for each run that you want to plot.
+-
+-Only the runs in the `labels` dictionary will be plotted, so make sure to include all relevant runs.
+-
+-We will be running the command `python plot.py` to generate the plots.
+-"""
+-    while True:
+-        _ = coder.run(next_prompt)
+-        return_code, next_prompt = run_plotting(folder_name)
+-        current_iter += 1
+-        if return_code == 0 or current_iter >= MAX_ITERS:
+-            break
+-    next_prompt = """
+-Please modify `notes.txt` with a description of what each plot shows along with the filename of the figure. Please do so in-depth.
+-
+-Somebody else will be using `notes.txt` to write a report on this in the future.
+-"""
+-    coder.run(next_prompt)
+-
++    return_code, plotting_message = run_plotting(folder_name)
++    if return_code != 0:
++        print(plotting_message)
++        return False
++    coder.run(
++        "The fixed plotting runner has generated the figures. Modify only notes.txt "
++        "with an evidence-bounded description of each figure and its filename."
++    )
+     return True
+diff -ruN orig/ai_scientist/perform_writeup.py patched/ai_scientist/perform_writeup.py
+--- orig/ai_scientist/perform_writeup.py	2025-12-19 07:46:21.000000000 +0000
++++ patched/ai_scientist/perform_writeup.py	2026-06-26 01:42:34.502985925 +0000
+@@ -5,12 +5,35 @@
+ import re
+ import shutil
+ import subprocess
++from pathlib import Path
+ from typing import Optional, Tuple
+ 
+ from ai_scientist.generate_ideas import search_for_papers
+ from ai_scientist.llm import get_response_from_llm, extract_json_between_markers, create_client, AVAILABLE_LLMS
+ 
+ 
++def _load_paper_contract(folder_name):
++    path = Path(folder_name) / "paper_contract.json"
++    if not path.exists():
++        return None
++    return json.loads(path.read_text(encoding="utf-8"))
++
++
++def _placeholder_tokens(folder_name):
++    contract = _load_paper_contract(folder_name)
++    if not contract:
++        return []
++    return list(contract.get("required_placeholders_absent") or [])
++
++
++def assert_no_placeholders(folder_name):
++    tex_path = Path(folder_name) / "latex" / "template.tex"
++    text = tex_path.read_text(encoding="utf-8")
++    remaining = [token for token in _placeholder_tokens(folder_name) if token in text]
++    if remaining:
++        raise RuntimeError(f"Unfilled manuscript placeholders remain: {remaining}")
++
++
+ # GENERATE LATEX
+ def generate_latex(coder, folder_name, pdf_file, timeout=30, num_error_corrections=5):
+     folder = osp.abspath(folder_name)
+@@ -27,8 +50,7 @@
+         re.DOTALL,
+     )
+     if references_bib is None:
+-        print("No references.bib found in template.tex")
+-        return
++        raise RuntimeError("No references.bib filecontents block found in template.tex")
+     bib_text = references_bib.group(1)
+     cites = [cite.strip() for item in cites for cite in item.split(",")]
+     for cite in cites:
+@@ -42,9 +64,9 @@
+     with open(writeup_file, "r") as f:
+         tex_text = f.read()
+     referenced_figs = re.findall(r"\\includegraphics.*?{(.*?)}", tex_text)
+-    all_figs = [f for f in os.listdir(folder) if f.endswith(".png")]
++    all_figs = sorted({path.name for path in Path(folder).rglob("*.png")})
+     for figure in referenced_figs:
+-        if figure not in all_figs:
++        if Path(figure).name not in all_figs:
+             print(f"Figure {figure} not found in directory.")
+             prompt = f"""The image {figure} not found in the directory. The images in the directory are: {all_figs}.
+ Please ensure that the figure is in the directory and that the filename is correct. Check the notes to see what each figure contains."""
+@@ -88,44 +110,66 @@
+             coder.run(prompt)
+         else:
+             break
++    contract = _load_paper_contract(folder_name)
++    if contract:
++        remaining = [
++            token
++            for token in contract.get("required_placeholders_absent", [])
++            if token in Path(writeup_file).read_text(encoding="utf-8")
++        ]
++        if remaining:
++            coder.run(
++                "The manuscript still contains forbidden placeholders: "
++                + repr(remaining)
++                + ". Replace every one with evidence-bounded final text now. "
++                "Do not alter machine-generated verified tables."
++            )
++        assert_no_placeholders(folder_name)
+     compile_latex(cwd, pdf_file, timeout=timeout)
++    if not Path(pdf_file).is_file() or Path(pdf_file).stat().st_size == 0:
++        raise RuntimeError(f"LaTeX compilation did not produce a non-empty PDF: {pdf_file}")
+ 
+ 
+ def compile_latex(cwd, pdf_file, timeout=30):
+     print("GENERATING LATEX")
+-
++    # LaTeX filecontents does not overwrite an existing references.bib, so remove
++    # stale PDF, bibliography, and auxiliary files before every compile.
++    for stale_name in (
++        "template.pdf",
++        "references.bib",
++        "template.aux",
++        "template.bbl",
++        "template.blg",
++        "template.log",
++        "template.out",
++        "template.fls",
++        "template.fdb_latexmk",
++    ):
++        (Path(cwd) / stale_name).unlink(missing_ok=True)
++    generated = Path(cwd) / "template.pdf"
+     commands = [
+         ["pdflatex", "-interaction=nonstopmode", "template.tex"],
+         ["bibtex", "template"],
+         ["pdflatex", "-interaction=nonstopmode", "template.tex"],
+         ["pdflatex", "-interaction=nonstopmode", "template.tex"],
+     ]
+-
++    last = None
+     for command in commands:
+         try:
+-            result = subprocess.run(
+-                command,
+-                cwd=cwd,
+-                stdout=subprocess.PIPE,
+-                stderr=subprocess.PIPE,
+-                text=True,
+-                timeout=timeout,
++            last = subprocess.run(
++                command, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++                text=True, timeout=timeout
+             )
+-            print("Standard Output:\n", result.stdout)
+-            print("Standard Error:\n", result.stderr)
+-        except subprocess.TimeoutExpired:
+-            print(f"Latex timed out after {timeout} seconds")
+-        except subprocess.CalledProcessError as e:
+-            print(f"Error running command {' '.join(command)}: {e}")
+-
++            print("Standard Output:\n", last.stdout)
++            print("Standard Error:\n", last.stderr)
++        except subprocess.TimeoutExpired as exc:
++            raise RuntimeError(f"LaTeX command timed out after {timeout} seconds: {command}") from exc
++    if not generated.is_file() or generated.stat().st_size == 0:
++        tail = "" if last is None else (last.stdout + "\n" + last.stderr)[-4000:]
++        raise RuntimeError("LaTeX failed to generate template.pdf. Tail:\n" + tail)
++    shutil.move(str(generated), pdf_file)
+     print("FINISHED GENERATING LATEX")
+ 
+-    # Attempt to move the PDF to the desired location
+-    try:
+-        shutil.move(osp.join(cwd, "template.pdf"), pdf_file)
+-    except FileNotFoundError:
+-        print("Failed to rename PDF.")
+-
+ 
+ per_section_tips = {
+     "Abstract": """
+@@ -168,7 +212,7 @@
+ - Shows the results of running Method on our problem described in Experimental Setup.
+ - Includes statements on hyperparameters and other potential issues of fairness.
+ - Only includes results that have actually been run and saved in the logs. Do not hallucinate results that don't exist.
+-- If results exist: compares to baselines and includes statistics and confidence intervals. 
++- If independent replications support uncertainty estimates, report them; otherwise explicitly avoid confidence intervals and pseudoreplication. 
+ - If results exist: includes ablation studies to show that specific parts of the method are relevant.
+ - Discusses limitations of the method.
+ - Make sure to include all the results from the experiments, and include all relevant figures.
+@@ -320,7 +364,7 @@
+         print(f"Error: {e}")
+         return None, False
+ 
+-    if papers is None:
++    if not papers:
+         print("No papers found.")
+         return None, False
+ 
+@@ -392,16 +436,89 @@
+ 
+     aider_prompt = (
+             aider_format.format(bibtex=bibtex_string, description=desc)
+-            + """\n You must use \cite or \citet to reference papers, do not manually type out author names."""
++            + """\n You must use \\cite or \\citet to reference papers, do not manually type out author names."""
+     )
+     return aider_prompt, False
+ 
+ 
++
++def _perform_contract_writeup(
++        idea, folder_name, coder, cite_client, cite_model, num_cite_rounds, engine
++):
++    contract = _load_paper_contract(folder_name)
++    if not contract:
++        raise RuntimeError("paper_contract.json is required")
++    evidence_path = Path(folder_name) / "paper_evidence.md"
++    if not evidence_path.is_file():
++        raise FileNotFoundError(evidence_path)
++    evidence = evidence_path.read_text(encoding="utf-8")
++    section_tips = contract["section_tips"]
++    section_order = contract["section_order"]
++    numeric_rule = contract.get("prose_numeric_policy", "")
++
++    coder.run(f"""Fill the title and abstract in latex/template.tex for the research program {idea['Title']}.
++Use only the evidence below. The manuscript describes a synthetic mechanism experiment, not causal estimates for real ministries.
++{numeric_rule}
++Do not leave placeholders. The abstract must be one paragraph.
++
++<verified_evidence>
++{evidence}
++</verified_evidence>
++
++Guidance: {section_tips['Abstract']}
++Use SEARCH/REPLACE edits only on latex/template.tex.""")
++    coder.run(
++        "Criticize and refine only the title and abstract. Preserve the synthetic claim boundary, "
++        "remove unsupported numerical prose, and leave no placeholders."
++    )
++
++    for section in section_order:
++        coder.run(f"""Fill exactly the existing section titled `{section}` in latex/template.tex.
++Guidance: {section_tips[section]}
++Use the verified evidence already provided. Keep machine-generated \\input{{../verified_results.tex}} unchanged.
++Do not type decimal or percentage outcome values in prose; refer to the verified tables and describe directions qualitatively.
++Do not claim confidence intervals or independent employee-level replication. Do not add or rename sections.
++Replace every placeholder or provisional caption inside this section. Use SEARCH/REPLACE edits only.""")
++        coder.run(
++            f"Criticize and refine only `{section}`. Check evidence traceability, claim scope, "
++            "section uniqueness, captions, and placeholder removal. Do not edit verified_results.tex."
++        )
++
++    rounds = min(int(contract.get("citation_rounds", 8)), int(num_cite_rounds))
++    for current_round in range(rounds):
++        draft = (Path(folder_name) / "latex" / "template.tex").read_text(encoding="utf-8")
++        prompt, done = get_citation_aider_prompt(
++            cite_client, cite_model, draft, current_round, rounds, engine=engine
++        )
++        if done:
++            break
++        if prompt is not None:
++            bibtex_string = prompt.split('"""')[1]
++            search_str = r"\end{filecontents}"
++            draft = draft.replace(search_str, f"{bibtex_string}{search_str}")
++            (Path(folder_name) / "latex" / "template.tex").write_text(draft, encoding="utf-8")
++            coder.run(prompt)
++
++    for section in ["Abstract", *section_order]:
++        coder.run(
++            f"Final pass on `{section}` only: remove repetition, unsupported claims, outcome numbers "
++            "outside verified tables, and any remaining placeholder language. Preserve all citations "
++            "and machine-generated table inputs."
++        )
++
++    generate_latex(coder, folder_name, str(Path(folder_name) / f"{idea['Name']}.pdf"))
++    assert_no_placeholders(folder_name)
++
++
+ # PERFORM WRITEUP
+ def perform_writeup(
+         idea, folder_name, coder, cite_client, cite_model, num_cite_rounds=20, engine="semanticscholar"
+ ):
+-    # CURRENTLY ASSUMES LATEX
++    if _load_paper_contract(folder_name):
++        return _perform_contract_writeup(
++            idea, folder_name, coder, cite_client, cite_model, num_cite_rounds, engine
++        )
++    # Generic upstream-compatible LaTeX path.
+     abstract_prompt = f"""We've provided the `latex/template.tex` file to the project. We will be filling it in section by section.
+ 
+ First, please fill in the "Title" and "Abstract" sections of the writeup.
+@@ -430,7 +547,7 @@
+         section_prompt = f"""Please fill in the {section} of the writeup. Some tips are provided below:
+ {per_section_tips[section]}
+ 
+-Be sure to use \cite or \citet where relevant, referring to the works provided in the file.
++Be sure to use \\cite or \\citet where relevant, referring to the works provided in the file.
+ Do not cite anything that is not already in `references.bib`. Do not add any new entries to this.
+ 
+ Keep the experimental results (figures and tables) only in the Results section, and make sure that any captions are filled in.
+diff -ruN orig/launch_scientist.py patched/launch_scientist.py
+--- orig/launch_scientist.py	2025-12-19 07:46:21.000000000 +0000
++++ patched/launch_scientist.py	2026-06-26 01:42:21.073014411 +0000
+@@ -15,6 +15,12 @@
+ 
+ from ai_scientist.generate_ideas import generate_ideas, check_idea_novelty
+ from ai_scientist.llm import create_client, AVAILABLE_LLMS
++from ai_scientist.policy_context import (
++    get_aider_model_name,
++    is_protected_policy_template,
++    load_problem_context,
++    scientist_visible_results,
++)
+ from ai_scientist.perform_experiments import perform_experiments
+ from ai_scientist.perform_review import perform_review, load_paper, perform_improvement
+ from ai_scientist.perform_writeup import perform_writeup, generate_latex
+@@ -79,7 +85,7 @@
+     parser.add_argument(
+         "--num-ideas",
+         type=int,
+-        default=50,
++        default=16,
+         help="Number of ideas to generate",
+     )
+     parser.add_argument(
+@@ -151,6 +157,57 @@
+     print(f"Worker {gpu_id} finished.")
+ 
+ 
++def _atomic_write_json(path, payload):
++    os.makedirs(osp.dirname(path), exist_ok=True)
++    tmp_path = f"{path}.tmp.{os.getpid()}"
++    with open(tmp_path, "w", encoding="utf-8") as handle:
++        json.dump(payload, handle, ensure_ascii=False, indent=2, sort_keys=True)
++        handle.flush()
++        os.fsync(handle.fileno())
++    os.replace(tmp_path, path)
++
++
++def _write_result_manifest(*, results_dir, folder_name, idea, status, success, started_at):
++    paper_path = osp.join(folder_name, f"{idea['Name']}.pdf")
++    improved_path = osp.join(folder_name, f"{idea['Name']}_improved.pdf")
++    payload = {
++        "schema_version": "1.0",
++        "template": "japan_policy_scientist",
++        "idea_name": idea["Name"],
++        "idea_title": idea["Title"],
++        "run_root": osp.abspath(folder_name),
++        "status": status,
++        "success": bool(success),
++        "started_at_utc": started_at,
++        "updated_at_utc": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
++        "phase": (
++            "final_paper_complete"
++            if osp.exists(osp.join(folder_name, "final_paper_manifest.json"))
++            else "development_complete" if success else status
++        ),
++        "development_complete": bool(success),
++        "paper_path": osp.abspath(paper_path) if osp.exists(paper_path) else None,
++        "improved_paper_path": osp.abspath(improved_path) if osp.exists(improved_path) else None,
++        "final_paper_path": None,
++        "claim_verification_path": osp.abspath(osp.join(folder_name, "claim_verification.json"))
++        if osp.exists(osp.join(folder_name, "claim_verification.json"))
++        else None,
++    }
++    _atomic_write_json(osp.join(folder_name, "result_manifest.json"), payload)
++    # Stable hand-off path used by selection, verification, and domain review.
++    _atomic_write_json(osp.join(results_dir, "result_manifest.json"), payload)
++    return payload
++
++
++def _protect_executable_sources(folder_name):
++    """Make copied executable/config sources read-only; data and write-up stay writable."""
++    for root, _dirs, files in os.walk(folder_name):
++        for filename in files:
++            path = osp.join(root, filename)
++            if filename.endswith((".py", ".yaml", ".yml")):
++                os.chmod(path, os.stat(path).st_mode & ~0o222)
++
++
+ def do_idea(
+         base_dir,
+         results_dir,
+@@ -168,14 +225,37 @@
+     folder_name = osp.join(results_dir, idea_name)
+     assert not osp.exists(folder_name), f"Folder {folder_name} already exists."
+     destination_dir = folder_name
+-    shutil.copytree(base_dir, destination_dir, dirs_exist_ok=True)
++    shutil.copytree(
++        base_dir,
++        destination_dir,
++        dirs_exist_ok=True,
++        ignore=shutil.ignore_patterns(
++            ".operator_audit",
++            "paired_behavioral_pilot",
++            "paired_behavioral_pilot_failed_attempts",
++        ),
++    )
++    _protect_executable_sources(folder_name)
++    protected_template = is_protected_policy_template(folder_name)
++    started_at = datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
++    idea_success = False
++    _write_result_manifest(
++        results_dir=results_dir,
++        folder_name=folder_name,
++        idea=idea,
++        status="running",
++        success=False,
++        started_at=started_at,
++    )
+     with open(osp.join(base_dir, "run_0", "final_info.json"), "r") as f:
+         baseline_results = json.load(f)
+     # Check if baseline_results is a dictionary before extracting means
+     if isinstance(baseline_results, dict):
+         baseline_results = {k: v["means"] for k, v in baseline_results.items()}
++    baseline_results = scientist_visible_results(base_dir, baseline_results)
+     exp_file = osp.join(folder_name, "experiment.py")
+     vis_file = osp.join(folder_name, "plot.py")
++    candidate_file = osp.join(folder_name, "candidate_policy.json")
+     notes = osp.join(folder_name, "notes.txt")
+     with open(notes, "w") as f:
+         f.write(f"# Title: {idea['Title']}\n")
+@@ -183,6 +263,10 @@
+         f.write(f"## Run 0: Baseline\n")
+         f.write(f"Results: {baseline_results}\n")
+         f.write(f"Description: Baseline results.\n")
++        context = load_problem_context(base_dir)
++        if context:
++            f.write("\n## Scientist-only problem context (never copy into agent prompts)\n")
++            f.write(context)
+     if log_file:
+         original_stdout = sys.stdout
+         original_stderr = sys.stderr
+@@ -194,7 +278,7 @@
+         print_time()
+         print(f"*Starting idea: {idea_name}*")
+         ## PERFORM EXPERIMENTS
+-        fnames = [exp_file, vis_file, notes]
++        fnames = [candidate_file, notes]
+         io = InputOutput(
+             yes=True, chat_history_file=f"{folder_name}/{idea_name}_aider.txt"
+         )
+@@ -205,8 +289,8 @@
+         elif model == "llama3.1-405b":
+             main_model = Model("openrouter/meta-llama/llama-3.1-405b-instruct")
+         else:
+-            main_model = Model(model)
+-        coder = Coder.create(
++            main_model = Model(get_aider_model_name(model))
++        coder = None if protected_template else Coder.create(
+             main_model=main_model,
+             fnames=fnames,
+             io=io,
+@@ -228,12 +312,30 @@
+             print(f"Experiments failed for idea {idea_name}")
+             return False
+ 
++        if protected_template:
++            development_marker = {
++                "status": "complete",
++                "phase": "development_complete",
++                "final_paper_deferred_until_after_selection_and_holdout": True,
++                "run_root": osp.abspath(folder_name),
++                "completed_runs": [f"run_{index}" for index in range(5)],
++            }
++            _atomic_write_json(
++                osp.join(folder_name, "development_complete.json"), development_marker
++            )
++            print(
++                "Protected policy development complete. Final paper and reviews are "
++                "intentionally deferred until immutable selection and holdout."
++            )
++            idea_success = True
++            return True
++
+         print_time()
+         print(f"*Starting Writeup*")
+         ## PERFORM WRITEUP
+         if writeup == "latex":
+             writeup_file = osp.join(folder_name, "latex", "template.tex")
+-            fnames = [exp_file, writeup_file, notes]
++            fnames = [writeup_file, notes]
+             if model == "deepseek-coder-v2-0724":
+                 main_model = Model("deepseek/deepseek-coder")
+             elif model == "deepseek-reasoner":
+@@ -241,7 +343,7 @@
+             elif model == "llama3.1-405b":
+                 main_model = Model("openrouter/meta-llama/llama-3.1-405b-instruct")
+             else:
+-                main_model = Model(model)
++                main_model = Model(get_aider_model_name(model))
+             coder = Coder.create(
+                 main_model=main_model,
+                 fnames=fnames,
+@@ -267,8 +369,8 @@
+                 paper_text = load_paper(f"{folder_name}/{idea['Name']}.pdf")
+                 review = perform_review(
+                     paper_text,
+-                    model="gpt-4o-2024-05-13",
+-                    client=openai.OpenAI(),
++                    model=client_model,
++                    client=client,
+                     num_reflections=5,
+                     num_fs_examples=1,
+                     num_reviews_ensemble=5,
+@@ -293,8 +395,8 @@
+                 paper_text = load_paper(f"{folder_name}/{idea['Name']}_improved.pdf")
+                 review = perform_review(
+                     paper_text,
+-                    model="gpt-4o-2024-05-13",
+-                    client=openai.OpenAI(),
++                    model=client_model,
++                    client=client,
+                     num_reflections=5,
+                     num_fs_examples=1,
+                     num_reviews_ensemble=5,
+@@ -306,11 +408,20 @@
+             except Exception as e:
+                 print(f"Failed to perform improvement: {e}")
+                 return False
++        idea_success = True
+         return True
+     except Exception as e:
+         print(f"Failed to evaluate idea {idea_name}: {str(e)}")
+         return False
+     finally:
++        _write_result_manifest(
++            results_dir=results_dir,
++            folder_name=folder_name,
++            idea=idea,
++            status="complete" if idea_success else "failed",
++            success=idea_success,
++            started_at=started_at,
++        )
+         print("FINISHED IDEA")
+         if log_file:
+             sys.stdout = original_stdout

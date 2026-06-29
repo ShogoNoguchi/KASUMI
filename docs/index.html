@@ -164,6 +164,7 @@
         <a href="#why">Why</a>
         <a href="#lineage">Lineage</a>
         <a href="#implementation">Implementation</a>
+        <a href="#e2e">E2E rerun</a>
         <a href="#contributions">Contributions</a>
         <a href="#results">Results</a>
         <a href="https://github.com/ShogoNoguchi/KASUMI">GitHub</a>
@@ -260,6 +261,26 @@
           <pre>src/shachi/env/japan_policy_scientist/</pre>
         </div>
       </div>
+    </section>
+
+
+    <section id="e2e" class="section">
+      <h2>Full provider-backed E2E rerun</h2>
+      <p class="section-intro">KASUMI includes two reproduction paths: a lightweight public-evidence replay and a live E2E harness. The live harness bootstraps pinned public upstream revisions of The AI Scientist and Shachi, applies the KASUMI task overlay, runs the Shachi baseline, prepares the packaged mechanism portfolio, runs AI Scientist development for candidate policies, freezes selection, runs multiseed holdout, generates the paper, and runs automated review.</p>
+      <div class="grid cards-2">
+        <div class="card">
+          <h3>Replay path</h3>
+          <p>No provider calls. Rebuilds public reports and figures from checked-in evidence artifacts.</p>
+          <pre>python scripts/run_replay_pipeline.py --evidence-dir artifacts/evidence --out-dir outputs/replay</pre>
+        </div>
+        <div class="card">
+          <h3>Live E2E path</h3>
+          <p>Requires API credentials and explicit opt-in. Reruns the research workflow from the task template and pinned upstream dependencies.</p>
+          <pre>scripts/e2e/bootstrap_workspace.sh "$HOME/kasumi-e2e-workspace"
+scripts/e2e/run_full_e2e.sh "$HOME/kasumi-e2e-workspace"</pre>
+        </div>
+      </div>
+      <p class="note">See <a href="https://github.com/ShogoNoguchi/KASUMI/blob/main/docs/E2E_REPRODUCTION.md">E2E_REPRODUCTION.md</a>. Hosted LLM reruns may not be bit-identical to the checked-in artifact snapshot, but the pipeline, contracts, seeds, holdout, paper generation, and review path are executable.</p>
     </section>
 
     <section id="results" class="section">

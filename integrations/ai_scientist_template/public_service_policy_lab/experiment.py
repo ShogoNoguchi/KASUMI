@@ -18,7 +18,7 @@ SCIENTIST-ONLY CONTRACT
   future prompt memory and do not drive exit, management priority, or transitions.
 - A deterministic finite management gate allocates support/triage/reform envelopes;
   optional LLM management is an ablation, and employees do not communicate directly.
-- Candidate selection rules and current public release development-only evidence rules are frozen outside the editable JSON.
+- Candidate selection, frozen-holdout, and evidence-generation rules are frozen outside the editable JSON.
 - The LLM returns bounded actions only.
 
 Command: python experiment.py --out_dir=run_i
