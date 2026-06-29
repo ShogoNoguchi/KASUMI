@@ -20,7 +20,7 @@ def _pretty_label(label: str) -> str:
 
 def _save(fig, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.06, 1, 1))
     fig.savefig(path, dpi=220, bbox_inches="tight")
     plt.close(fig)
 
@@ -142,7 +142,7 @@ def plot_primary_welfare_vs_service_loss(development: dict[str, Any], out_dir: s
         "responsive_management_pathway": (12, 10),
         "procedural_justice_pathway": (12, -22),
         "capital_deepening_pathway": (16, -34),
-        "direct_staffing_pathway": (-34, 12),
+        "direct_staffing_pathway": (-18, 8),
     }
     for p in points:
         label = _pretty_label(p["label"])
