@@ -141,8 +141,8 @@ def plot_primary_welfare_vs_service_loss(development: dict[str, Any], out_dir: s
         "synthetic_stressed_reference_v2": (12, -24),
         "responsive_management_pathway": (12, 10),
         "procedural_justice_pathway": (12, -22),
-        "capital_deepening_pathway": (16, -42),
-        "direct_staffing_pathway": (-118, 12),
+        "capital_deepening_pathway": (16, -34),
+        "direct_staffing_pathway": (-34, 12),
     }
     for p in points:
         label = _pretty_label(p["label"])
@@ -185,13 +185,8 @@ def plot_primary_welfare_vs_service_loss(development: dict[str, Any], out_dir: s
         color="#064e3b",
         bbox={"boxstyle": "round,pad=0.3", "fc": "#ecfdf5", "ec": "#a7f3d0", "alpha": 0.96},
     )
-    ax.annotate(
-        "",
-        xy=(0.12, 0.84),
-        xytext=(0.27, 0.70),
-        xycoords="axes fraction",
-        arrowprops={"arrowstyle": "->", "lw": 1.6, "color": "#0f766e"},
-    )
+    # The preferred-region cue is kept as a badge only.
+    # Removing the arrow avoids visual interference with the selected-policy label.
 
     handles = [
         plt.Line2D([0], [0], marker=style["selected"]["marker"], color="w", markerfacecolor=style["selected"]["color"], markeredgecolor="#10233d", markersize=14, label="Selected"),
