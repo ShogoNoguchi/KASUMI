@@ -14,3 +14,4 @@ def test_replay_pipeline(tmp_path):
     assert Path(result['report']).is_file()
     assert (tmp_path / 'figures' / 'development_candidate_primary_delta.png').is_file()
     assert (tmp_path / 'figures' / 'holdout_primary_delta_by_seed.png').is_file()
+    assert (tmp_path / 'figures' / 'primary_welfare_vs_service_loss.png').is_file()

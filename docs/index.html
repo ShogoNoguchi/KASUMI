@@ -145,6 +145,7 @@
     }
     .figure { background: white; padding: 18px; border-radius: 22px; border:1px solid var(--line); box-shadow: var(--shadow); }
     .figure img { display:block; max-width:100%; border-radius: 14px; }
+    .caption { margin: 12px 2px 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
     .note { border-left: 5px solid var(--blue); background: white; padding: 18px 20px; border-radius: 14px; color: var(--muted); }
     .refs li { margin: 8px 0; }
     footer { padding: 38px 0 0; color: var(--muted); font-size: 14px; }
@@ -263,15 +264,27 @@
 
     <section id="results" class="section">
       <h2>Result: capital deepening pathway</h2>
-      <p class="section-intro">The development stage selected <code>capital_deepening_pathway</code>. In frozen holdout, the selected policy improved the primary welfare endpoint in every cell while satisfying all guardrails.</p>
+      <p class="section-intro">The development stage selected <code>capital_deepening_pathway</code>. The result is not presented as a real-world policy estimate; it is a replayable synthetic finding: the selected pathway improved the preregistered welfare endpoint while remaining inside the service and fairness guardrails, then repeated the improvement in frozen holdout cells.</p>
       <div class="grid cards-3">
         <div class="card"><h3>Selected run</h3><p><code>run_3</code><br><code>capital_deepening_pathway</code></p></div>
-        <div class="card"><h3>Development delta</h3><p><code>0.005479431872</code> over stressed reference.</p></div>
-        <div class="card"><h3>Mean holdout delta</h3><p><code>0.007192530420</code> across three frozen holdout cells.</p></div>
+        <div class="card"><h3>Development delta</h3><p><code>+0.005479431872</code> staff-welfare composite vs the stressed reference.</p></div>
+        <div class="card"><h3>Mean holdout delta</h3><p><code>+0.007192530420</code> across three frozen holdout cells.</p></div>
       </div>
       <div class="figure" style="margin-top:18px;">
-        <img src="artifacts/figures/primary_welfare_vs_service_loss.png" alt="Primary welfare versus service loss figure">
+        <img src="artifacts/figures/primary_welfare_vs_service_loss.png" alt="Development-stage welfare and service-harm tradeoff">
+        <p class="caption"><strong>How to read this figure.</strong> The preferred direction is upper-left: higher staff welfare and lower service harm than the stressed reference. The selected capital-deepening pathway is the only candidate that combines the largest welfare gain with lower service-harm points while satisfying all development guardrails. The x-axis uses a symmetric-log scale so the high-harm direct-staffing outlier remains visible.</p>
       </div>
+      <div class="grid cards-2" style="margin-top:18px;">
+        <div class="figure">
+          <img src="artifacts/figures/development_candidate_primary_delta.png" alt="Development candidate primary endpoint deltas">
+          <p class="caption">Development candidate deltas against the stressed reference. Green marks the selected pathway; muted bars indicate candidates that failed at least one development guardrail.</p>
+        </div>
+        <div class="figure">
+          <img src="artifacts/figures/holdout_primary_delta_by_seed.png" alt="Holdout primary endpoint deltas by seed">
+          <p class="caption">Frozen holdout robustness. The selected pathway improved the primary endpoint in all three unreused seed cells.</p>
+        </div>
+      </div>
+      <p class="note" style="margin-top:18px;">The public replay regenerates these figures from <a href="artifacts/evidence/development_selection_summary.json">development_selection_summary.json</a>, <a href="artifacts/evidence/development_tradeoff_points.csv">development_tradeoff_points.csv</a>, and <a href="artifacts/evidence/development_guardrails.csv">development_guardrails.csv</a>. The full simulation root was used only to recover the stressed-reference service-harm coordinate and guardrail matrix, then the values were sanitized into public evidence files.</p>
     </section>
 
     <section id="claim-boundary" class="section">

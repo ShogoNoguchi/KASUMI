@@ -21,6 +21,8 @@ def write_markdown_report(bundle: EvidenceBundle, figure_dir: Path, out_path: st
         f"Primary endpoint: `{dev['primary_endpoint']}`.",
         f"Selected delta vs reference: `{dev['selected_delta_vs_reference']:.12f}`.",
         "",
+        "![Development-stage tradeoff](figures/primary_welfare_vs_service_loss.png)",
+        "",
         "![Development candidate deltas](figures/development_candidate_primary_delta.png)",
         "",
         "## Multiseed holdout",

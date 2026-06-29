@@ -2,6 +2,40 @@
 
 These notes collect the external sources used to motivate KASUMI's public README and GitHub Pages narrative. They are source cards, not proof that the synthetic model is calibrated to any real ministry.
 
+
+## Public result data provenance
+
+The public results figure was refreshed after checking the complete evidence archive supplied with the release materials. The key recovered value is the stressed-reference service-harm coordinate:
+
+```text
+run_0 synthetic_stressed_reference_v2
+primary_staff_welfare_composite_post = 0.4332721888260301
+cumulative_service_harm_points_post = 64823.29375446918
+```
+
+This value is now included in:
+
+```text
+artifacts/evidence/development_selection_summary.json
+```
+
+The plotting table and candidate guardrail matrix are exposed as:
+
+```text
+artifacts/evidence/development_tradeoff_points.csv
+```
+
+```text
+artifacts/evidence/development_guardrails.csv
+```
+
+Why it matters for KASUMI: the public Pages figure is no longer only a static image copied from a prior run. It can be regenerated from sanitized public evidence using:
+
+```text
+python scripts/regenerate_public_figures.py
+```
+
+
 ## Kasumigaseki personnel-policy background
 
 ### Cabinet Secretariat / National Personnel Authority young-official proposal

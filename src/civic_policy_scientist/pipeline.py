@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 from .evidence import load_evidence
-from .plotting import plot_development_candidates, plot_holdout_cells
+from .plotting import plot_development_candidates, plot_holdout_cells, plot_primary_welfare_vs_service_loss
 from .report import write_markdown_report
 from .verify import verify_public_bundle
 
@@ -17,6 +17,7 @@ def run(evidence_dir: str | Path, out_dir: str | Path) -> dict[str, object]:
     verification = verify_public_bundle(evidence_dir)
     plot_development_candidates(bundle.development, figures)
     plot_holdout_cells(bundle.holdout, figures)
+    plot_primary_welfare_vs_service_loss(bundle.development, figures)
     report_path = write_markdown_report(bundle, figures, out_dir / "REPLAY_REPORT.md")
     result = {"report": str(report_path), **verification}
     (out_dir / "replay_manifest.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")

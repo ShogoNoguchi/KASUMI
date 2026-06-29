@@ -23,6 +23,8 @@
 
 **KASUMI** is a synthetic, end-to-end policy-science workflow for studying **bureaucratic personnel policy** in a simulated public-service organization. It combines AI-Scientist-style idea generation, a Shachi-style LLM-agent/ABM environment, frozen multiseed holdout evaluation, evidence-bound writing, numeric claim verification, and automated review.
 
+In one sentence: KASUMI turns a personnel-policy question into a replayable synthetic research artifact—candidate policies, simulation evidence, holdout checks, verified claims, automated reviews, and an anonymous generated paper.
+
 > **Claim boundary.** KASUMI reports synthetic simulation evidence only. It is not a real-world causal estimate, a personnel evaluation system, a digital twin of any actual ministry, or an operational policy recommendation.
 
 ## Why KASUMI exists
@@ -108,6 +110,18 @@ Public evidence summary:
 | Verified claims | `153` |
 | Automated review recommendations | `accept_poc`, `accept_poc` |
 
+<p align="center">
+  <img src="artifacts/figures/primary_welfare_vs_service_loss.png" alt="Development-stage welfare and service-harm tradeoff" width="760">
+</p>
+
+The result figure is regenerated from the public evidence bundle. The x-axis is the service-harm change relative to the stressed reference, and the y-axis is the staff-welfare change relative to the same reference. The preferred direction is upper-left. The selected capital-deepening pathway is highlighted because it gives the largest guardrail-passing welfare gain while reducing service-harm points relative to the stressed reference.
+
+### Public result data products
+
+- [`artifacts/evidence/development_selection_summary.json`](artifacts/evidence/development_selection_summary.json): selection rule, reference values, selected run, candidate metrics, and public claim boundary.
+- [`artifacts/evidence/development_tradeoff_points.csv`](artifacts/evidence/development_tradeoff_points.csv): the sanitized plotting table for the development-stage tradeoff figure.
+- [`artifacts/evidence/development_guardrails.csv`](artifacts/evidence/development_guardrails.csv): candidate-by-guardrail matrix recovered from the final successful evidence root and sanitized for public inspection.
+
 ## Contribution surfaces
 
 ### Contribution to AI-Scientist-style workflows
@@ -178,16 +192,19 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 python scripts/run_replay_pipeline.py --evidence-dir artifacts/evidence --out-dir outputs/replay
+python scripts/regenerate_public_figures.py
 python scripts/audit_public_release.py .
 pytest -q
 ```
 
-The replay command rebuilds a small report and two summary figures from the public evidence bundle. It does not call any LLM provider.
+The replay command rebuilds a small report and summary figures from the public evidence bundle. `regenerate_public_figures.py` refreshes the public result figures under both `artifacts/figures/` and `docs/artifacts/figures/`. Neither command calls an LLM provider.
 
 ## Main paper and evidence
 
 - [Generated paper](paper/FINAL_POLICY_PAPER.pdf)
 - [Development selection summary](artifacts/evidence/development_selection_summary.json)
+- [Development tradeoff plotting table](artifacts/evidence/development_tradeoff_points.csv)
+- [Development guardrail matrix](artifacts/evidence/development_guardrails.csv)
 - [Multiseed holdout summary](artifacts/evidence/multiseed_holdout_summary.json)
 - [Claim verification summary](artifacts/evidence/verification_summary.json)
 - [Automated reviews](artifacts/evidence/automated_reviews_public.json)

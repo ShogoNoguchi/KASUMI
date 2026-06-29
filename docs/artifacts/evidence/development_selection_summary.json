@@ -17,7 +17,9 @@
       "delta_vs_reference": 0.0018534889203202787,
       "guardrails_passed": true,
       "policy_cost_points": 32.4,
-      "service_harm_points": 64970.689685536745
+      "service_harm_points": 64970.689685536745,
+      "service_harm_delta_vs_reference": 147.39593106756365,
+      "selected": false
     },
     {
       "run": "run_2",
@@ -26,7 +28,9 @@
       "delta_vs_reference": -0.0008633899104193432,
       "guardrails_passed": false,
       "policy_cost_points": 33.28,
-      "service_harm_points": 64822.72915798168
+      "service_harm_points": 64822.72915798168,
+      "service_harm_delta_vs_reference": -0.5645964875002392,
+      "selected": false
     },
     {
       "run": "run_3",
@@ -35,7 +39,9 @@
       "delta_vs_reference": 0.005479431871758755,
       "guardrails_passed": true,
       "policy_cost_points": 24.31,
-      "service_harm_points": 64797.95680807639
+      "service_harm_points": 64797.95680807639,
+      "service_harm_delta_vs_reference": -25.336946392788377,
+      "selected": true
     },
     {
       "run": "run_4",
@@ -44,8 +50,18 @@
       "delta_vs_reference": 0.003338388097049172,
       "guardrails_passed": false,
       "policy_cost_points": 32.55,
-      "service_harm_points": 66879.19550464551
+      "service_harm_points": 66879.19550464551,
+      "service_harm_delta_vs_reference": 2055.90175017633,
+      "selected": false
     }
   ],
-  "claim_boundary": "Synthetic simulation evidence only; no real-world causal or policy-effect claim is made."
+  "claim_boundary": "Synthetic simulation evidence only; no real-world causal or policy-effect claim is made.",
+  "reference": {
+    "run": "run_0",
+    "label": "synthetic_stressed_reference_v2",
+    "primary_endpoint": 0.4332721888260301,
+    "service_harm_points": 64823.29375446918
+  },
+  "reference_label": "synthetic_stressed_reference_v2",
+  "baseline_service_harm_points": 64823.29375446918
 }

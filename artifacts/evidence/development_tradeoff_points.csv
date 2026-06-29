@@ -1,0 +1,6 @@
+run,label,role,selected,guardrails_passed,primary_endpoint,primary_delta_vs_reference,service_harm_points,service_harm_delta_vs_reference,policy_cost_points
+run_0,synthetic_stressed_reference_v2,reference,False,True,0.4332721888260301,0.0,64823.29375446918,0.0,0.0
+run_1,responsive_management_pathway,candidate,False,True,0.43512567774635036,0.0018534889203202787,64970.689685536745,147.39593106756365,32.4
+run_2,procedural_justice_pathway,candidate,False,False,0.43240879891561074,-0.0008633899104193432,64822.72915798168,-0.5645964875002392,33.28
+run_3,capital_deepening_pathway,candidate,True,True,0.43875162069778884,0.005479431871758755,64797.95680807639,-25.336946392788377,24.31
+run_4,direct_staffing_pathway,candidate,False,False,0.43661057692307925,0.003338388097049172,66879.19550464551,2055.90175017633,32.55
